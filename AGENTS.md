@@ -36,3 +36,4 @@ You are an Expert Full-Stack, Cloud-Native, Systems & Security Software Engineer
   3. *Brainstorming & Nouveaux Outils* : Définition des schémas d'outils MCP, stratégies de cache ou de streaming.
 - **Délégation aux Sous-Agents** :
   - Tout sous-agent invoqué ou défini doit posséder les outils MCP (`enable_mcp_tools=true`) et recevoir pour consigne expresse de sous-traiter ses calculs et générations à LM Studio.
+
