@@ -3,13 +3,12 @@
     "lmstudio": {
       "command": "node",
       "args": [
-        "E:\\SourceCode\\LMStudio_MCP_Connector\\dist\\index.js"
+        "<PATH_TO_LMSTUDIO_MCP_CONNECTOR>/dist/index.js"
       ],
       "env": {
-        "LMSTUDIO_API_URL": "http://192.168.0.108:1234"
+        "LMSTUDIO_API_URL": "http://127.0.0.1:1234"
       },
       "disabled": false
     }
   }
 }
-

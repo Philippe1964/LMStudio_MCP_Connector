@@ -3,7 +3,7 @@
 Cette règle s'applique à l'agent principal ainsi qu'à **tous les sous-agents** intervenant dans ce workspace pour réduire au strict minimum la consommation de tokens distants payants.
 
 ## 1. Principe Zéro Token Payant Inutile
-Le modèle local hébergé sur LM Studio (`google/gemma-4-e4b` sur `http://192.168.0.108:1234`) offre des inférences **gratuites, illimitées et locales**.
+Le modèle local hébergé sur LM Studio (accessible sur `http://127.0.0.1:1234` ou l'adresse configurée) offre des inférences **gratuites, illimitées et locales**.
 Le modèle cloud payant ne doit servir que de chef d'orchestre léger et de validateur final.
 
 ## 2. Cas d'Usage Obligatoires de Délégation via `lmstudio_chat`

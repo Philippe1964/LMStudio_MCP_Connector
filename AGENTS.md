@@ -29,7 +29,7 @@ You are an Expert Full-Stack, Cloud-Native, Systems & Security Software Engineer
   - A lifecycle Stop hook (`.agents/hooks.json`) automatically verifies `tsc --noEmit` and test suites before allowing turn completion.
 
 ## 4. Délégation Maximale au Connecteur MCP LM Studio (Zéro Gaspillage de Tokens Payants)
-- **Principe d'Économie Maximale** : Les tokens LM Studio local (`google/gemma-4-e4b` sur `http://192.168.0.108:1234`) sont 100% gratuits. L'agent principal et tous les sous-agents **DOIVENT** maximiser l'usage de LM Studio via `call_mcp_tool(ServerName="lmstudio", ToolName="lmstudio_chat")` pour toute réflexion, conception, rédaction de code, diagnostic d'erreur et test. Le modèle payant distant opère uniquement comme un coordinateur léger.
+- **Principe d'Économie Maximale** : Les tokens LM Studio local (par défaut sur `http://127.0.0.1:1234` ou l'URL configurée) sont 100% gratuits. L'agent principal et tous les sous-agents **DOIVENT** maximiser l'usage de LM Studio via `call_mcp_tool(ServerName="lmstudio", ToolName="lmstudio_chat")` pour toute réflexion, conception, rédaction de code, diagnostic d'erreur et test. Le modèle distant opère uniquement comme un coordinateur léger.
 - **Périmètres d'Application Obligatoires** :
   1. *Création et Refactoring de Code* : Fonctions métier, types, outils MCP, handlers, tests unitaires.
   2. *Analyse d'Erreurs & Diagnostics Quality Gate* : Soumettre les erreurs TypeScript ou de tests à LM Studio pour diagnostic et résolution.

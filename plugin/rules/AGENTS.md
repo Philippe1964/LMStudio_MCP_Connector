@@ -1,12 +1,12 @@
 # Global Engineering Standard: Maximized Free LM Studio LLM Delegation & Token Optimization
 
-This rule applies globally across all existing and future projects on this machine to minimize paid token consumption by delegating all possible reasoning, coding, and analysis to the local LM Studio model (`google/gemma-4-e4b` on `http://192.168.0.108:1234`).
+This rule applies globally across all existing and future projects to minimize paid token consumption by delegating all possible reasoning, coding, and analysis to the local LM Studio model (accessible via the configured LM Studio instance, default `http://127.0.0.1:1234`).
 
 ## 1. Principe Fondamental : Délégation Maximale au LLM Local Gratuit
 Les tokens du modèle local LM Studio sont **100% gratuits et illimités**. À l'inverse, les tokens des modèles distants sont payants.
 Par conséquent, l'agent principal et tous les sous-agents **DOIVENT systématiquement et prioritairement** sous-traiter toute tâche de calcul cognitif, de réflexion, de conception et de génération à LM Studio via l'outil MCP `call_mcp_tool(ServerName="lmstudio", ToolName="lmstudio_chat")`.
 
-Le modèle distant payant agit comme un **orchestrateur léger**, tandis que LM Studio exécute le travail textuel, algorithmique et analytique lourd.
+Le modèle distant payant agit comme un **orchestrateur léger**, tandis que le modèle local LM Studio (automatiquement détecté ou spécifié par configuration) exécute le travail textuel, algorithmique et analytique lourd.
 
 ## 2. Périmètres d'Application Obligatoires
 
@@ -35,5 +35,4 @@ Pour **toute écriture de code** (fonctions métier, classes, composants d'inter
   - `lmstudio-qa-reviewer` : Pour la revue qualité, l'analyse d'erreurs IDE et l'application des correctifs.
 
 ## 4. Confidentialité et Sécurité Locale
-- Le traitement local via LM Studio garantit que le code propriétaire, les algorithmes sensibles et les données métier ne quittent pas la machine de développement.
-
+- Le traitement local via LM Studio garantit que le code propriétaire, les algorithmes sensibles et les données métier ne quittent pas la machine de développement ou le réseau local sécurisé.

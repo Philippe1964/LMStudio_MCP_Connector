@@ -9,7 +9,7 @@ export const MCP_TOOLS: McpTool[] = [
   {
     name: "lmstudio_chat",
     description:
-      "Send a prompt or instruction to the local LM Studio model (e.g. google/gemma-4-e4b) and get the generated completion.",
+      "Send a prompt or instruction to the local LM Studio model and get the generated completion.",
     inputSchema: {
       type: "object",
       properties: {
@@ -103,7 +103,8 @@ export async function executeTool(
       });
 
       const choice = response.choices && response.choices[0];
-      const assistantText = choice?.message?.content || "(no text generated)";
+      const assistantText =
+        choice?.message?.content || choice?.message?.reasoning_content || "(no text generated)";
       const usage = response.usage
         ? `\n\n[Tokens: ${response.usage.prompt_tokens} prompt + ${response.usage.completion_tokens} completion = ${response.usage.total_tokens} total | Model: ${response.model || model}]`
         : `\n\n[Model: ${response.model || model}]`;

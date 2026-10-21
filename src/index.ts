@@ -22,23 +22,31 @@ Usage:
   node dist/index.js [options]
 
 Options:
-  --url <url>                    LM Studio API Base URL (default: http://192.168.0.108:1234 or $LMSTUDIO_API_URL)
-  --fallback-chat-model <name>   Fallback chat model (default: google/gemma-4-e4b or $LMSTUDIO_FALLBACK_CHAT_MODEL)
+  --url, -u <url>                LM Studio API Base URL (default: http://127.0.0.1:1234 or $LMSTUDIO_API_URL)
+  --model, -m <name>             Model to use or fallback chat model (default: auto-detected, or $LMSTUDIO_CHAT_MODEL / $LMSTUDIO_FALLBACK_CHAT_MODEL)
+  --fallback-chat-model <name>   Alias for --model
   --fallback-embed-model <name>  Fallback embedding model (default: text-embedding-nomic-embed-text-v1.5 or $LMSTUDIO_FALLBACK_EMBED_MODEL)
-  --timeout <ms>                 HTTP Request timeout in ms (default: 60000 or $LMSTUDIO_TIMEOUT_MS)
+  --timeout, -t <ms>             HTTP Request timeout in ms (default: 60000 or $LMSTUDIO_TIMEOUT_MS)
   --check-health                 Perform a quick one-off health check and exit
   --version, -v                  Display version number
   --help, -h                     Show this help message
 
 Environment Variables:
-  LMSTUDIO_API_URL               Base URL of LM Studio (e.g. http://192.168.0.108:1234)
-  LMSTUDIO_FALLBACK_CHAT_MODEL   Default chat model if auto-detection fails
+  LMSTUDIO_API_URL               Base URL of LM Studio (default: http://127.0.0.1:1234)
+  LMSTUDIO_CHAT_MODEL            Default chat model name or fallback (e.g. meta-llama-3.1-8b, qwen2.5-7b, default)
+  LMSTUDIO_FALLBACK_CHAT_MODEL   Alias for LMSTUDIO_CHAT_MODEL
   LMSTUDIO_FALLBACK_EMBED_MODEL  Default embedding model if auto-detection fails
-  LMSTUDIO_TIMEOUT_MS            Request timeout in milliseconds
+  LMSTUDIO_TIMEOUT_MS            Request timeout in milliseconds (default: 60000)
 
 Examples:
-  # Start standard MCP stdio server:
-  npx lmstudio-mcp-connector --url http://192.168.0.108:1234
+  # Start standard MCP stdio server with defaults (http://127.0.0.1:1234):
+  npx lmstudio-mcp-connector
+
+  # Connect to remote or LAN LM Studio instance:
+  npx lmstudio-mcp-connector --url http://192.168.1.50:1234
+
+  # Specify default model explicitly:
+  npx lmstudio-mcp-connector --model my-loaded-model
 
   # Check LM Studio connectivity:
   node dist/index.js --check-health
