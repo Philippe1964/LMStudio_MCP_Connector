@@ -184,3 +184,4 @@ LMStudio_MCP_Connector/
 ## 📜 Licence
 
 Distribué sous licence **MIT**. Voir [LICENSE](LICENSE) pour plus de détails.
+

@@ -56,3 +56,4 @@ test("McpServer handles initialize, ping and tools/list requests", async () => {
     process.stdout.write = origStdoutWrite;
   }
 });
+

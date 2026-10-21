@@ -2,3 +2,4 @@
   "name": "lmstudio-connector",
   "description": "Global LM Studio connector providing local model inference (google/gemma-4-e4b) and mandatory code generation rules across all projects."
 }
+

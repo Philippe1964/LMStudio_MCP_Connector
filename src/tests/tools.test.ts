@@ -88,3 +88,4 @@ test("executeTool throws for unknown tool name", async () => {
     { message: "Unknown tool: unknown_tool" }
   );
 });
+

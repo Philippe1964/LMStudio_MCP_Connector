@@ -1,0 +1,12 @@
+{
+  "typescript-and-test-quality-gate": {
+    "enabled": true,
+    "Stop": [
+      {
+        "type": "command",
+        "command": "node scripts/quality_gate_hook.js",
+        "timeout": 45
+      }
+    ]
+  }
+}

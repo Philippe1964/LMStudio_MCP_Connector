@@ -36,3 +36,4 @@ Pour **toute écriture de code** (fonctions métier, classes, composants d'inter
 
 ## 4. Confidentialité et Sécurité Locale
 - Le traitement local via LM Studio garantit que le code propriétaire, les algorithmes sensibles et les données métier ne quittent pas la machine de développement.
+

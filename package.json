@@ -34,6 +34,7 @@
     "start": "node dist/index.js",
     "test": "node --test dist/tests/**/*.test.js",
     "test:src": "tsc && node --test dist/tests/**/*.test.js",
+    "quality-gate": "node scripts/quality_gate_hook.js --cli",
     "prepublishOnly": "npm run build && npm run test"
   },
   "devDependencies": {
@@ -44,3 +45,4 @@
     "node": ">=18.0.0"
   }
 }
+

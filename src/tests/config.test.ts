@@ -40,3 +40,4 @@ test("parseCliAndEnvConfig parses CLI timeout and model overrides", () => {
   assert.equal(config.fallbackChatModel, "llama-3.3-70b");
   assert.equal(config.fallbackEmbedModel, "bge-m3");
 });
+

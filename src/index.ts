@@ -71,3 +71,4 @@ main().catch((err) => {
   console.error("[lmstudio-mcp] Fatal server startup error:", err);
   process.exit(1);
 });
+
