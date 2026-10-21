@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "lmstudio": {
+      "command": "node",
+      "args": [
+        "E:\\SourceCode\\LMStudio_MCP_Connector\\dist\\index.js",
+        "--url",
+        "http://192.168.0.108:1234"
+      ]
+    }
+  }
+}

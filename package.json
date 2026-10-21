@@ -1,0 +1,46 @@
+{
+  "name": "lmstudio-mcp-connector",
+  "version": "1.0.0",
+  "description": "Model Context Protocol (MCP) Server for local LM Studio instances with Stdio JSON-RPC transport",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "lmstudio",
+    "llm",
+    "ai",
+    "json-rpc",
+    "gemini",
+    "claude",
+    "cursor"
+  ],
+  "author": "Antigravity Team",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "lmstudio-mcp-connector": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "plugin",
+    "config",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "start": "node dist/index.js",
+    "test": "node --test dist/tests/**/*.test.js",
+    "test:src": "tsc && node --test dist/tests/**/*.test.js",
+    "prepublishOnly": "npm run build && npm run test"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
