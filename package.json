@@ -1,7 +1,7 @@
 {
   "name": "lmstudio-mcp-connector",
-  "version": "1.0.0",
-  "description": "Model Context Protocol (MCP) Server for local LM Studio instances with Stdio JSON-RPC transport",
+  "version": "2.0.0",
+  "description": "Model Context Protocol (MCP) Server & Daemon for local LM Studio instances with Multi-Instance Load Balancing, Failover, Web Monitoring GUI and Remote LLM Fallback Directives",
   "keywords": [
     "mcp",
     "model-context-protocol",
@@ -40,6 +40,7 @@
     "test": "node --test dist/tests/**/*.test.js",
     "test:src": "tsc && node --test dist/tests/**/*.test.js",
     "quality-gate": "node scripts/quality_gate_hook.js --cli",
+    "wiki:sync": "node scripts/sync-wiki.js",
     "prepublishOnly": "npm run build && npm run test"
   },
   "devDependencies": {

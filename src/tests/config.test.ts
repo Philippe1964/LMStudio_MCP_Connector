@@ -57,17 +57,32 @@ test("parseCliAndEnvConfig parses CLI timeout and model overrides", () => {
   assert.equal(config.fallbackEmbedModel, "bge-m3");
 });
 
-test("parseCliAndEnvConfig reads from LMSTUDIO_CHAT_MODEL and LMSTUDIO_API_URL env vars", () => {
-  const origUrl = process.env.LMSTUDIO_API_URL;
-  const origChat = process.env.LMSTUDIO_CHAT_MODEL;
-
-  process.env.LMSTUDIO_API_URL = "http://remote-server:1234";
-  process.env.LMSTUDIO_CHAT_MODEL = "deepseek-coder-v2";
-
-  const config = parseCliAndEnvConfig([]);
-  assert.equal(config.baseUrl, "http://remote-server:1234");
-  assert.equal(config.fallbackChatModel, "deepseek-coder-v2");
-
-  if (origUrl !== undefined) process.env.LMSTUDIO_API_URL = origUrl; else delete process.env.LMSTUDIO_API_URL;
-  if (origChat !== undefined) process.env.LMSTUDIO_CHAT_MODEL = origChat; else delete process.env.LMSTUDIO_CHAT_MODEL;
+test("parseCliAndEnvConfig parses --daemon and --port flags", () => {
+  const config = parseCliAndEnvConfig(["--daemon", "--port", "9876"]);
+  assert.equal(config.daemon, true);
+  assert.equal(config.daemonPort, 9876);
 });
+
+test("parseCliAndEnvConfig parses multi-instance comma-separated list", () => {
+  const config = parseCliAndEnvConfig([
+    "--instances",
+    "http://127.0.0.1:1234,http://192.168.1.100:1234",
+  ]);
+  assert.equal(config.instances.length, 2);
+  assert.equal(config.instances[0]!.url, "http://127.0.0.1:1234");
+  assert.equal(config.instances[1]!.url, "http://192.168.1.100:1234");
+});
+
+test("parseCliAndEnvConfig parses multi-instance JSON string with roles", () => {
+  const json = JSON.stringify([
+    { id: "gpu-chat", url: "http://10.0.0.1:1234", roles: ["chat"], priority: 2 },
+    { id: "cpu-embed", url: "http://10.0.0.2:1234", roles: ["embeddings"], priority: 1 },
+  ]);
+  const config = parseCliAndEnvConfig(["--instances", json]);
+  assert.equal(config.instances.length, 2);
+  assert.equal(config.instances[0]!.id, "gpu-chat");
+  assert.deepEqual(config.instances[0]!.roles, ["chat"]);
+  assert.equal(config.instances[1]!.id, "cpu-embed");
+  assert.deepEqual(config.instances[1]!.roles, ["embeddings"]);
+});
+

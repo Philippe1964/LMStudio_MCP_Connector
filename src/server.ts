@@ -4,6 +4,7 @@
 
 import readline from "node:readline";
 import type { LmStudioClient } from "./lmstudio-client.js";
+import type { PoolManager } from "./pool-manager.js";
 import { MCP_TOOLS, executeTool } from "./tools.js";
 import type {
   JsonRpcErrorObject,
@@ -13,12 +14,146 @@ import type {
 } from "./types.js";
 
 export class McpServer {
-  private readonly client: LmStudioClient;
+  private readonly target: LmStudioClient | PoolManager;
+  private daemonUrl: string | null = null;
   private inFlightCount = 0;
   private isClosed = false;
 
-  constructor(client: LmStudioClient) {
-    this.client = client;
+  constructor(target: LmStudioClient | PoolManager, daemonUrl?: string | null) {
+    this.target = target;
+    this.daemonUrl = daemonUrl ?? null;
+  }
+
+  public getTarget(): LmStudioClient | PoolManager {
+    return this.target;
+  }
+
+  public setDaemonUrl(url: string | null): void {
+    this.daemonUrl = url ? url.replace(/\/+$/, "") : null;
+  }
+
+  public getDaemonUrl(): string | null {
+    return this.daemonUrl;
+  }
+
+  public static async probeDaemon(url: string, timeoutMs = 300): Promise<boolean> {
+    try {
+      const cleanUrl = url.replace(/\/+$/, "");
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      const res = await fetch(`${cleanUrl}/api/status`, {
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+      return res.ok;
+    } catch {
+      return false;
+    }
+  }
+
+  public async processRpcRequest(request: JsonRpcRequest): Promise<JsonRpcResponse> {
+    // If daemon URL is configured and active, forward RPC request to daemon
+    if (this.daemonUrl) {
+      try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 60000);
+        const res = await fetch(`${this.daemonUrl}/mcp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(request),
+          signal: controller.signal,
+        });
+        clearTimeout(timer);
+
+        if (res.ok) {
+          return (await res.json()) as JsonRpcResponse;
+        }
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error(
+          `[lmstudio-mcp] Forwarding to daemon (${this.daemonUrl}) failed (${msg}). Falling back to local execution.`
+        );
+      }
+    }
+
+    const { id, method, params } = request;
+
+    try {
+      switch (method) {
+        case "initialize":
+          return {
+            jsonrpc: "2.0",
+            id,
+            result: {
+              protocolVersion: "2024-11-05",
+              capabilities: {
+                tools: {},
+              },
+              serverInfo: {
+                name: "lmstudio-mcp-connector",
+                version: "2.0.0",
+              },
+            },
+          };
+
+        case "ping":
+          return {
+            jsonrpc: "2.0",
+            id,
+            result: {},
+          };
+
+        case "tools/list":
+          return {
+            jsonrpc: "2.0",
+            id,
+            result: {
+              tools: MCP_TOOLS,
+            },
+          };
+
+        case "tools/call": {
+          const toolName = typeof params?.["name"] === "string" ? params["name"] : "";
+          const toolArgs =
+            params?.["arguments"] && typeof params["arguments"] === "object"
+              ? (params["arguments"] as Record<string, unknown>)
+              : {};
+
+          const result = await executeTool(this.target, toolName, toolArgs);
+          return {
+            jsonrpc: "2.0",
+            id,
+            result,
+          };
+        }
+
+        default:
+          return {
+            jsonrpc: "2.0",
+            id,
+            error: {
+              code: -32601,
+              message: `Method not found: ${method}`,
+            },
+          };
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`[lmstudio-mcp] Error handling RPC method ${method}:`, msg);
+      return {
+        jsonrpc: "2.0",
+        id,
+        result: {
+          content: [
+            {
+              type: "text",
+              text: `Error: ${msg}`,
+            },
+          ],
+          isError: true,
+        },
+      };
+    }
   }
 
   public sendResponse(id: string | number, result: unknown): void {
@@ -45,72 +180,27 @@ export class McpServer {
   }
 
   public async handleRequest(request: JsonRpcRequest): Promise<void> {
-    const { id, method, params } = request;
-
-    try {
-      switch (method) {
-        case "initialize":
-          this.sendResponse(id, {
-            protocolVersion: "2024-11-05",
-            capabilities: {
-              tools: {},
-            },
-            serverInfo: {
-              name: "lmstudio-mcp-connector",
-              version: "1.0.0",
-            },
-          });
-          break;
-
-        case "ping":
-          this.sendResponse(id, {});
-          break;
-
-        case "tools/list":
-          this.sendResponse(id, {
-            tools: MCP_TOOLS,
-          });
-          break;
-
-        case "tools/call": {
-          const toolName = typeof params?.["name"] === "string" ? params["name"] : "";
-          const toolArgs =
-            params?.["arguments"] && typeof params["arguments"] === "object"
-              ? (params["arguments"] as Record<string, unknown>)
-              : {};
-
-          const result = await executeTool(this.client, toolName, toolArgs);
-          this.sendResponse(id, result);
-          break;
-        }
-
-        default:
-          this.sendError(id, -32601, `Method not found: ${method}`);
-          break;
-      }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      console.error(`[lmstudio-mcp] Error handling RPC method ${method}:`, msg);
-      this.sendResponse(id, {
-        content: [
-          {
-            type: "text",
-            text: `Error: ${msg}`,
-          },
-        ],
-        isError: true,
-      });
-    }
+    const response = await this.processRpcRequest(request);
+    process.stdout.write(JSON.stringify(response) + "\n");
   }
 
   public start(): void {
-    console.error(
-      `[lmstudio-mcp] Server starting with LM Studio target: ${this.client.getBaseUrl()}...`
-    );
+    const isPool = "getPoolReport" in this.target;
+    if (isPool) {
+      (this.target as PoolManager).startHealthCheck();
+      console.error("[lmstudio-mcp] Stdio MCP Server running with Multi-Instance Pool Manager.");
+    } else {
+      console.error(
+        `[lmstudio-mcp] Stdio MCP Server running with target: ${(this.target as LmStudioClient).getBaseUrl()}...`
+      );
+    }
 
     const checkExit = () => {
       if (this.isClosed && this.inFlightCount === 0) {
         console.error("[lmstudio-mcp] Stdio stream closed, exiting.");
+        if (isPool) {
+          (this.target as PoolManager).destroy();
+        }
         process.exit(0);
       }
     };
@@ -166,13 +256,18 @@ export class McpServer {
 
     process.on("SIGINT", () => {
       console.error("[lmstudio-mcp] Received SIGINT, shutting down...");
+      if (isPool) {
+        (this.target as PoolManager).destroy();
+      }
       process.exit(0);
     });
 
     process.on("SIGTERM", () => {
       console.error("[lmstudio-mcp] Received SIGTERM, shutting down...");
+      if (isPool) {
+        (this.target as PoolManager).destroy();
+      }
       process.exit(0);
     });
   }
 }
-

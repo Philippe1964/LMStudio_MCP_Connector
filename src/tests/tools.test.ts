@@ -2,14 +2,18 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { MCP_TOOLS, executeTool } from "../tools.js";
 import { LmStudioClient } from "../lmstudio-client.js";
+import { PoolManager, AllInstancesUnavailableError } from "../pool-manager.js";
+import { REMOTE_FALLBACK_DIRECTIVE } from "../types.js";
+import { parseCliAndEnvConfig } from "../config.js";
 
-test("MCP_TOOLS contains all 4 standard tools", () => {
+test("MCP_TOOLS contains all 5 standard tools", () => {
   const toolNames = MCP_TOOLS.map((t) => t.name);
   assert.ok(toolNames.includes("lmstudio_chat"));
   assert.ok(toolNames.includes("lmstudio_list_models"));
   assert.ok(toolNames.includes("lmstudio_embeddings"));
   assert.ok(toolNames.includes("lmstudio_health"));
-  assert.equal(MCP_TOOLS.length, 4);
+  assert.ok(toolNames.includes("lmstudio_pool_status"));
+  assert.equal(MCP_TOOLS.length, 5);
 
   const chatTool = MCP_TOOLS.find((t) => t.name === "lmstudio_chat");
   assert.ok(chatTool?.inputSchema.required?.includes("prompt"));
@@ -51,6 +55,35 @@ test("executeTool executes lmstudio_chat via mock client", async () => {
   assert.match(result.content[0]!.text, /Tokens: 10 prompt/);
 });
 
+test("executeTool returns remote fallback directive when all instances fail in PoolManager", async () => {
+  const config = parseCliAndEnvConfig([
+    "--instances",
+    "http://127.0.0.1:9999,http://127.0.0.1:9998",
+  ]);
+  const pool = new PoolManager(config);
+
+  // Mock pool executeWithFailover to throw AllInstancesUnavailableError
+  pool.executeWithFailover = async () => {
+    throw new AllInstancesUnavailableError(pool.getPoolReport(), "All mock instances offline");
+  };
+
+  const result = await executeTool(pool, "lmstudio_chat", { prompt: "Code review" });
+  assert.equal(result.isError, true);
+  assert.equal(result.content.length, 1);
+  assert.ok(result.content[0]!.text.includes(REMOTE_FALLBACK_DIRECTIVE));
+  assert.ok(result.content[0]!.text.includes("All mock instances offline"));
+});
+
+test("executeTool executes lmstudio_pool_status via PoolManager", async () => {
+  const config = parseCliAndEnvConfig(["--instances", "http://127.0.0.1:1234"]);
+  const pool = new PoolManager(config);
+
+  const result = await executeTool(pool, "lmstudio_pool_status", {});
+  assert.equal(result.content.length, 1);
+  const parsed = JSON.parse(result.content[0]!.text);
+  assert.equal(parsed.totalCount, 1);
+});
+
 test("executeTool executes lmstudio_list_models via mock client", async () => {
   const fakeClient = {
     getBaseUrl: () => "http://mock-host:1234",
@@ -88,4 +121,3 @@ test("executeTool throws for unknown tool name", async () => {
     { message: "Unknown tool: unknown_tool" }
   );
 });
-

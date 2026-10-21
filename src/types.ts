@@ -130,3 +130,43 @@ export interface HealthCheckResult {
   modelNames: string[];
 }
 
+export type InstanceRole = "chat" | "embeddings" | "all";
+export type InstanceHealth = "ONLINE" | "OFFLINE" | "DEGRADED" | "UNKNOWN";
+
+export interface InstanceConfig {
+  id: string;
+  name?: string | undefined;
+  url: string;
+  roles: InstanceRole[];
+  priority?: number | undefined;
+}
+
+export interface InstanceMetrics {
+  totalRequests: number;
+  failedRequests: number;
+  inFlightRequests: number;
+  latencyMs: number;
+  lastCheckedAt?: number | undefined;
+  loadedModels: string[];
+}
+
+export interface InstanceRuntimeState {
+  config: InstanceConfig;
+  health: InstanceHealth;
+  metrics: InstanceMetrics;
+  consecutiveFailures: number;
+}
+
+export interface PoolStatusReport {
+  instances: Array<InstanceRuntimeState & { activeModelNames: string[] }>;
+  activeCount: number;
+  totalCount: number;
+  allOffline: boolean;
+}
+
+export const REMOTE_FALLBACK_DIRECTIVE =
+  "⚠️ [LM STUDIO OFFLINE - REMOTE FALLBACK REQUIRED]\n" +
+  "No local LM Studio instances are currently reachable.\n" +
+  "Antigravity is instructed to immediately fulfill this user request using its native remote LLM capabilities without failing the turn.";
+
+

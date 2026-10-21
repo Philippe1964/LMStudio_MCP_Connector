@@ -1,220 +1,121 @@
-# LM Studio MCP Connector
+# LM Studio MCP Connector & Daemon
 
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
 [![MCP Specification](https://img.shields.io/badge/MCP-2024--11--05-orange.svg)](https://modelcontextprotocol.io/)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20Windows-blue.svg)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-2.0.0-purple.svg)](package.json)
 
-Un serveur **Model Context Protocol (MCP)** autonome, moderne et ultra-performant écrit en **TypeScript** pour connecter n'importe quel client IA (Antigravity, Gemini, Claude Desktop, Cursor, VS Code) à une instance locale ou distante de **LM Studio** via le protocole Stdio JSON-RPC.
-
-Compatible nativement avec **Linux**, **macOS** (Intel & Apple Silicon) et **Windows**, avec des scripts d'installation et de configuration automatisés dédiés à chaque environnement.
+Un serveur et daemon **Model Context Protocol (MCP)** autonome, moderne et ultra-résilient écrit en **TypeScript** pour connecter n'importe quelle plateforme agentique (Antigravity, Gemini, Claude Desktop, Cursor, VS Code) à une ou plusieurs instances de **LM Studio**.
 
 ---
 
-## 🌟 Points Forts
+## 🌟 Nouveautés de la Version 2.0.0
 
-- ⚡ **Zéro dépendance d'exécution (`zero-runtime dependencies`)** : S'appuie exclusivement sur les API natives de Node.js (`fetch`, `readline`, `AbortController`). Démarrage instantané, empreinte mémoire minimale, zéro vulnérabilité CVE.
-- 🐧 🍏 🪟 **Support Multi-Plateforme Natif** : Scripts d'installation et de configuration dédiés et interactifs pour **Linux**, **macOS** et **Windows**.
-- 🛠️ **Configuration Automatisée des Clients MCP** : Détection et mise à jour sécurisée des fichiers de configuration pour **Claude Desktop**, **Cursor IDE** et **Antigravity / Gemini CLI** sans écraser vos serveurs existants.
-- 🤖 **Support Multi-Modèles & Détection Dynamique** : Détection automatique en temps réel des modèles chat et embedding chargés dans LM Studio (Llama, Qwen, Gemma, Mistral, DeepSeek, etc.), avec modèle de repli paramétrable.
-- 🌐 **Totalement Générique & Portable** : Fonctionne aussi bien en local (`http://127.0.0.1:1234`) qu'à travers un réseau local LAN ou un serveur distant via variable d'environnement ou options CLI.
-- 🧪 **Suite de Tests Intégrée** : Tests unitaires et d'intégration via le test runner natif de Node (`node:test`, `node:assert/strict`).
-- 🩺 **Outils CLI Intégrés** : Diagnostic de santé en direct (`--check-health`), flags courts et longs pour l'URL et les modèles.
+- 🔀 **Architecture Multi-Instances & Répartition de Charge (Load Balancing)** : Déclarez plusieurs machines ou instances LM Studio (local, réseau LAN, GPU dédié). Les requêtes sont réparties intelligemment selon la charge en cours (*Least-Connections*).
+- 🛡️ **Failover Automatique & Circuit Breaker** : Si une instance sature, timeout ou tombe en panne, le connecteur bascule automatiquement et de manière transparente sur l'instance de secours éligible.
+- ⚡ **Directive de Repli Automatique vers LLM Distant (Antigravity Fallback)** : Si **toutes** les instances locales sont indisponibles, le connecteur retourne un diagnostic explicite (`REMOTE FALLBACK REQUIRED`) ordonnant à l'agent Antigravity de réaliser la tâche via ses modèles distants natifs sans bloquer ni échouer l'exécution.
+- 🖥️ **Mode Daemon HTTP & Dashboard Web Intégré** : Lancez le connecteur en tâche de fond avec `--daemon` pour exposer une interface Web moderne en temps réel (`http://127.0.0.1:9123/`) permettant de monitorer les latences, requêtes en vol, modèles chargés et d'ajouter/supprimer des instances dynamiquement sans redémarrage.
+- 🏷️ **Routage Spécialisé par Rôles** : Attribuez des rôles (`chat`, `embeddings`, `all`) à chaque instance pour réserver par exemple les embeddings à un CPU/GPU rapide sans ralentir la génération de code du gros modèle LLM.
+- ⚡ **Zéro dépendance d'exécution (`zero-runtime dependencies`)** : Toujours 100% natif Node.js (`fetch`, `readline`, `node:http`, `node:events`, `AbortController`).
 
 ---
 
 ## 🛠️ Outils MCP Exposés
 
-Le connecteur expose 4 outils standardisés :
+Le connecteur expose 5 outils standardisés :
 
 | Outil | Description | Paramètres principaux |
 | :--- | :--- | :--- |
-| `lmstudio_chat` | Envoie un prompt ou une instruction au modèle local LM Studio et retourne la complétion générée. | `prompt` (requis), `system_prompt`, `model`, `temperature`, `max_tokens` |
-| `lmstudio_list_models` | Liste tous les modèles IA actuellement chargés et prêts dans LM Studio. | *Aucun* |
-| `lmstudio_embeddings` | Calcule les vecteurs d'embeddings pour un texte donné avec le modèle d'embedding local. | `input` (requis), `model` |
-| `lmstudio_health` | Vérifie la disponibilité, la latence et les modèles actifs de l'instance LM Studio. | *Aucun* |
+| `lmstudio_chat` | Envoie un prompt ou une instruction au modèle local LM Studio avec auto-détection, load balancing et repli distant si panne totale. | `prompt` (requis), `system_prompt`, `model`, `temperature`, `max_tokens` |
+| `lmstudio_list_models` | Inventorie tous les modèles IA disponibles à travers les instances actives du pool. | *Aucun* |
+| `lmstudio_embeddings` | Calcule les vecteurs d'embeddings pour un texte donné avec le modèle d'embedding configuré. | `input` (requis), `model` |
+| `lmstudio_health` | Vérifie la disponibilité, la latence et les modèles actifs de chaque instance du pool. | *Aucun* |
+| `lmstudio_pool_status` | Fournit un rapport JSON complet du pool : statut, latence, requêtes en vol et taux d'erreurs. | *Aucun* |
 
 ---
 
-## 📋 Prérequis
+## 🚀 Modes d'Utilisation
 
-1. **Node.js** >= 18.0.0 (testé et validé sur Node 18, 20, 22 et 24).
-2. **LM Studio** lancé avec le serveur local démarré (par défaut sur `http://127.0.0.1:1234` ou sur une adresse IP de votre réseau).
-3. Au moins un modèle chargé dans LM Studio pour le chat, et optionnellement un modèle pour l'embedding (ex. `nomic-embed-text`).
-
----
-
-## ⚡ Installation Rapide par Environnement
-
-Des scripts dédiés vérifient les prérequis Node.js, installent les dépendances, compilent le projet TypeScript, configurent vos clients MCP (Claude Desktop, Cursor, Gemini) et testent la connexion avec LM Studio.
-
-### 🐧 Sur Linux (Ubuntu, Debian, Fedora, Arch, openSUSE...)
-```bash
-# Rendre le script exécutable et le lancer :
-chmod +x scripts/install-linux.sh
-./scripts/install-linux.sh
-
-# Ou via npm si les dépendances sont déjà présentes :
-npm run install:linux
-```
-
-### 🍏 Sur macOS (Apple Silicon M1/M2/M3/M4 & Intel)
-```bash
-# Rendre le script exécutable et le lancer :
-chmod +x scripts/install-macos.sh
-./scripts/install-macos.sh
-
-# Ou via npm :
-npm run install:macos
-```
-
-*(Note : Sur macOS et Linux, vous pouvez également utiliser le lanceur universel POSIX `./scripts/install.sh`)*.
-
-### 🪟 Sur Windows (PowerShell 5.1 ou 7+)
-```powershell
-# Exécuter le script PowerShell dédié :
-powershell -ExecutionPolicy Bypass -File scripts\install-windows.ps1
-
-# Ou via npm :
-npm run install:windows
-```
-
----
-
-## 🎛️ Assistant de Configuration Universel (`npm run setup`)
-
-Le projet inclut un moteur de configuration multi-plateforme autonome (`scripts/setup.js`) écrit en pur JavaScript ESM Node.js.
-
-### Mode Interactif
-```bash
-npm run setup
-```
-L'assistant vous guide pas à pas :
-1. Détecte votre système d'exploitation et l'emplacement de vos dossiers de configuration.
-2. Demande l'adresse de votre serveur LM Studio (par défaut `http://127.0.0.1:1234`).
-3. Vous propose de configurer automatiquement un ou l'ensemble des clients MCP installés :
-   - **Claude Desktop**
-   - **Cursor IDE**
-   - **Antigravity / Gemini CLI**
-4. Teste immédiatement la connectivité avec LM Studio.
-
-### Mode Automatisé / Non-Interactif (CI / Déploiement silencieux)
-```bash
-# Configuration silencieuse avec les valeurs par défaut pour tous les clients :
-node scripts/setup.js --yes
-
-# Configuration avec une adresse LM Studio sur le réseau local :
-node scripts/setup.js --yes --url http://192.168.1.50:1234 --model qwen2.5-coder-7b
-
-# Configuration d'un seul client spécifique (ex. Claude Desktop) :
-node scripts/setup.js --yes --client claude
-```
-
----
-
-## 💻 Utilisation CLI
-
-### Test de connectivité (Health Check)
-```bash
-# Test avec l'adresse par défaut (http://127.0.0.1:1234) :
-node dist/index.js --check-health
-
-# Test avec une URL personnalisée (IP LAN ou serveur distant) :
-node dist/index.js --url http://192.168.1.50:1234 --check-health
-```
-
-### Options de la ligne de commande
-```text
-Options:
-  --url, -u <url>                URL de base de l'API LM Studio (défaut: http://127.0.0.1:1234 ou $LMSTUDIO_API_URL)
-  --model, -m <name>             Modèle chat par défaut ou repli (défaut: auto-détecté ou $LMSTUDIO_CHAT_MODEL)
-  --fallback-chat-model <name>   Alias pour --model
-  --fallback-embed-model <name>  Modèle embedding par défaut (défaut: text-embedding-nomic-embed-text-v1.5)
-  --timeout, -t <ms>             Délai d'expiration HTTP en ms (défaut: 60000 ou $LMSTUDIO_TIMEOUT_MS)
-  --check-health                 Effectue un test de santé et quitte
-  --version, -v                  Affiche le numéro de version
-  --help, -h                     Affiche l'aide
-```
-
-### Variables d'Environnement
-Toutes les options sont configurables sans modifier la ligne de commande via un fichier `.env` ou votre environnement :
-- `LMSTUDIO_API_URL` : URL du serveur LM Studio (défaut: `http://127.0.0.1:1234`).
-- `LMSTUDIO_CHAT_MODEL` ou `LMSTUDIO_FALLBACK_CHAT_MODEL` : Modèle de chat spécifique si vous souhaitez forcer un modèle précis ou en cas d'absence de détection automatique.
-- `LMSTUDIO_FALLBACK_EMBED_MODEL` : Modèle d'embedding de repli.
-- `LMSTUDIO_TIMEOUT_MS` : Timeout des requêtes HTTP en millisecondes (défaut: `60000`).
-
----
-
-## ⚙️ Emplacement des Fichiers de Configuration par OS
-
-Si vous préférez configurer vos clients manuellement plutôt que d'utiliser `npm run setup`, voici les chemins standards :
-
-| Client | Linux | macOS | Windows |
-| :--- | :--- | :--- | :--- |
-| **Claude Desktop** | `~/.config/Claude/claude_desktop_config.json` | `~/Library/Application Support/Claude/claude_desktop_config.json` | `%APPDATA%\Claude\claude_desktop_config.json` |
-| **Cursor IDE** | `~/.cursor/mcp.json` | `~/.cursor/mcp.json` | `%USERPROFILE%\.cursor\mcp.json` |
-| **Antigravity / Gemini** | `~/.gemini/config/mcp_config.json` | `~/.gemini/config/mcp_config.json` | `%USERPROFILE%\.gemini\config\mcp_config.json` |
-
-### Exemple de configuration type
-Remplacez `<CHEMIN_VERS_PROJET>` par le chemin absolu du dossier `LMStudio_MCP_Connector` sur votre machine.
-
+### 1. Mode Stdio Standard (Direct pour Antigravity / Claude / Cursor)
+Dans vos fichiers de configuration MCP (`mcp_config.json`, `claude_desktop_config.json`, etc.) :
 ```json
 {
   "mcpServers": {
     "lmstudio": {
       "command": "node",
       "args": [
-        "<CHEMIN_VERS_PROJET>/dist/index.js",
-        "--url",
-        "http://127.0.0.1:1234"
+        "E:/SourceCode/LMStudio_MCP_Connector/dist/index.js",
+        "--instances",
+        "http://127.0.0.1:1234,http://192.168.1.50:1234"
       ]
     }
   }
 }
 ```
 
+### 2. Mode Daemon HTTP avec Dashboard Web
+Lancez le connecteur en daemon autonome :
+```bash
+node dist/index.js --daemon --port 9123 --instances "http://127.0.0.1:1234,http://192.168.1.50:1234"
+```
+- **Dashboard Web interactif** : Ouvrez votre navigateur sur `http://127.0.0.1:9123/`
+- **Endpoint MCP HTTP / RPC** : `POST http://127.0.0.1:9123/mcp`
+- **Flux temps réel SSE** : `GET http://127.0.0.1:9123/api/events`
+
 ---
 
-## 📁 Architecture du Projet
+## 💻 Options de la Ligne de Commande
 
 ```text
-LMStudio_MCP_Connector/
-├── src/
-│   ├── types.ts              # Interfaces JSON-RPC, schémas MCP & API LM Studio
-│   ├── config.ts             # Résolution des arguments CLI et variables d'environnement
-│   ├── lmstudio-client.ts    # Client HTTP natif (fetch, timeout, détection auto dynamique)
-│   ├── tools.ts              # Définitions des 4 outils MCP et handlers d'exécution
-│   ├── server.ts             # Serveur MCP Stdio JSON-RPC (initialize, ping, tools/list, tools/call)
-│   ├── index.ts              # Point d'entrée exécutable (CLI, flags, lancement)
-│   └── tests/
-│       ├── config.test.ts    # Tests unitaires du parsing de configuration
-│       ├── setup.test.ts     # Tests multi-OS des chemins et de la fusion de configurations
-│       ├── tools.test.ts     # Tests d'exécution des outils et validation des schémas
-│       └── server.test.ts    # Tests du flux JSON-RPC Stdio
-├── scripts/
-│   ├── setup.js              # Moteur de configuration cross-plateforme (Linux/macOS/Windows)
-│   ├── install.sh            # Lanceur universel POSIX (Linux/macOS)
-│   ├── install-linux.sh      # Script d'installation dédié Linux
-│   ├── install-macos.sh      # Script d'installation dédié macOS
-│   ├── install-windows.ps1   # Script d'installation dédié Windows (PowerShell)
-│   └── quality_gate_hook.js  # Quality gate automatique (tsc + tests)
-├── config/                   # Modèles de configuration prêts à l'emploi
-│   ├── gemini_mcp_config.example.json
-│   ├── claude_desktop_config.example.json
-│   └── cursor_mcp_config.example.json
-├── plugin/                   # Bundle pour intégration comme plugin Antigravity
-│   ├── plugin.json
-│   ├── mcp_config.json
-│   ├── rules/AGENTS.md
-│   └── skills/lmstudio/SKILL.md
-├── dist/                     # Code JavaScript compilé
-├── package.json
-├── tsconfig.json
-├── .gitignore
-├── .env.example
-├── LICENSE
-└── README.md
+Options:
+  --daemon, -d                   Lance en mode Daemon HTTP & SSE avec Dashboard Web intégré
+  --port, --daemon-port, -p <n>  Port du Daemon HTTP & Web GUI (défaut: 9123 ou $LMSTUDIO_DAEMON_PORT)
+  --instances <urls/json>        Liste des instances LM Studio (séparées par virgule ou JSON)
+  --url, -u <url>                URL de l'instance primaire (défaut: http://127.0.0.1:1234)
+  --model, -m <name>             Modèle chat par défaut ou repli (défaut: auto-détecté)
+  --fallback-chat-model <name>   Alias pour --model
+  --fallback-embed-model <name>  Modèle embedding par défaut (défaut: text-embedding-nomic-embed-text-v1.5)
+  --timeout, -t <ms>             Délai d'expiration HTTP en ms (défaut: 60000)
+  --check-health                 Effectue un test de santé sur toutes les instances et quitte
+  --version, -v                  Affiche le numéro de version (v2.0.0)
+  --help, -h                     Affiche l'aide
+```
+
+### Format JSON Avancé pour `--instances` ou `LMSTUDIO_INSTANCES`
+Vous pouvez définir des instances avec des rôles et des priorités :
+```json
+[
+  { "id": "local-gpu", "name": "RTX 4090", "url": "http://127.0.0.1:1234", "roles": ["chat"], "priority": 2 },
+  { "id": "lan-embed", "name": "Serveur Embeddings", "url": "http://192.168.1.50:1234", "roles": ["embeddings"], "priority": 1 },
+  { "id": "backup-cpu", "name": "Secours", "url": "http://192.168.1.60:1234", "roles": ["all"], "priority": 1 }
+]
+```
+
+---
+
+## 🛡️ Résilience & Repli Automatique vers LLM Distant
+
+Lorsque toutes les instances locales LM Studio sont arrêtées ou injoignables :
+1. Le connecteur ne bloque pas la requête et ne plante pas le processus.
+2. L'outil retourne un statut `isError: true` avec la directive explicite :
+   ```
+   ⚠️ [LM STUDIO OFFLINE - REMOTE FALLBACK REQUIRED]
+   No local LM Studio instances are currently reachable.
+   Antigravity is instructed to immediately fulfill this user request using its native remote LLM capabilities without failing the turn.
+   ```
+3. L'agent Antigravity comprend instantanément qu'il doit exécuter la tâche avec ses capacités natives distantes, assurant une continuité de service totale.
+4. Dès qu'une instance LM Studio redémarre, le healthcheck automatique rétablit son statut `ONLINE` en temps réel.
+
+---
+
+## 🧪 Tests & Quality Gate
+
+Le projet est rigoureusement validé par un Quality Gate automatisé :
+```bash
+# Lancer les vérifications strictes TypeScript et les 27 tests unitaires / intégration :
+node scripts/quality_gate_hook.js --cli
 ```
 
 ---
