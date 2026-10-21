@@ -3,20 +3,23 @@
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
 [![MCP Specification](https://img.shields.io/badge/MCP-2024--11--05-orange.svg)](https://modelcontextprotocol.io/)
+[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20Windows-blue.svg)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Un serveur **Model Context Protocol (MCP)** autonome, moderne et ultra-performant écrit en **TypeScript** pour connecter n'importe quel client IA (Antigravity, Gemini, Claude Desktop, Cursor, VS Code) à une instance locale ou distante de **LM Studio** via le protocole Stdio JSON-RPC.
+
+Compatible nativement avec **Linux**, **macOS** (Intel & Apple Silicon) et **Windows**, avec des scripts d'installation et de configuration automatisés dédiés à chaque environnement.
 
 ---
 
 ## 🌟 Points Forts
 
 - ⚡ **Zéro dépendance d'exécution (`zero-runtime dependencies`)** : S'appuie exclusivement sur les API natives de Node.js (`fetch`, `readline`, `AbortController`). Démarrage instantané, empreinte mémoire minimale, zéro vulnérabilité CVE.
-- 🛡️ **Typage Strict TypeScript** : Architecture modulaire, séparation stricte des responsabilités (`types`, `config`, `client`, `tools`, `server`, `cli`).
+- 🐧 🍏 🪟 **Support Multi-Plateforme Natif** : Scripts d'installation et de configuration dédiés et interactifs pour **Linux**, **macOS** et **Windows**.
+- 🛠️ **Configuration Automatisée des Clients MCP** : Détection et mise à jour sécurisée des fichiers de configuration pour **Claude Desktop**, **Cursor IDE** et **Antigravity / Gemini CLI** sans écraser vos serveurs existants.
 - 🤖 **Support Multi-Modèles & Détection Dynamique** : Détection automatique en temps réel des modèles chat et embedding chargés dans LM Studio (Llama, Qwen, Gemma, Mistral, DeepSeek, etc.), avec modèle de repli paramétrable.
 - 🌐 **Totalement Générique & Portable** : Fonctionne aussi bien en local (`http://127.0.0.1:1234`) qu'à travers un réseau local LAN ou un serveur distant via variable d'environnement ou options CLI.
 - 🧪 **Suite de Tests Intégrée** : Tests unitaires et d'intégration via le test runner natif de Node (`node:test`, `node:assert/strict`).
-- 🔌 **Compatibilité Universelle** : Conçu pour Antigravity / Gemini CLI, Claude Desktop, Cursor, VS Code Roo Code / Cline, et tout client conforme à la spécification MCP.
 - 🩺 **Outils CLI Intégrés** : Diagnostic de santé en direct (`--check-health`), flags courts et longs pour l'URL et les modèles.
 
 ---
@@ -42,27 +45,77 @@ Le connecteur expose 4 outils standardisés :
 
 ---
 
-## 🚀 Installation & Compilation
+## ⚡ Installation Rapide par Environnement
 
+Des scripts dédiés vérifient les prérequis Node.js, installent les dépendances, compilent le projet TypeScript, configurent vos clients MCP (Claude Desktop, Cursor, Gemini) et testent la connexion avec LM Studio.
+
+### 🐧 Sur Linux (Ubuntu, Debian, Fedora, Arch, openSUSE...)
 ```bash
-# Cloner ou se placer dans le répertoire du connecteur
-cd LMStudio_MCP_Connector
+# Rendre le script exécutable et le lancer :
+chmod +x scripts/install-linux.sh
+./scripts/install-linux.sh
 
-# Installer les dépendances de développement (TypeScript, types)
-npm install
+# Ou via npm si les dépendances sont déjà présentes :
+npm run install:linux
+```
 
-# Compiler le projet TypeScript vers dist/
-npm run build
+### 🍏 Sur macOS (Apple Silicon M1/M2/M3/M4 & Intel)
+```bash
+# Rendre le script exécutable et le lancer :
+chmod +x scripts/install-macos.sh
+./scripts/install-macos.sh
 
-# Exécuter la suite de tests unitaires
-npm test
+# Ou via npm :
+npm run install:macos
+```
+
+*(Note : Sur macOS et Linux, vous pouvez également utiliser le lanceur universel POSIX `./scripts/install.sh`)*.
+
+### 🪟 Sur Windows (PowerShell 5.1 ou 7+)
+```powershell
+# Exécuter le script PowerShell dédié :
+powershell -ExecutionPolicy Bypass -File scripts\install-windows.ps1
+
+# Ou via npm :
+npm run install:windows
+```
+
+---
+
+## 🎛️ Assistant de Configuration Universel (`npm run setup`)
+
+Le projet inclut un moteur de configuration multi-plateforme autonome (`scripts/setup.js`) écrit en pur JavaScript ESM Node.js.
+
+### Mode Interactif
+```bash
+npm run setup
+```
+L'assistant vous guide pas à pas :
+1. Détecte votre système d'exploitation et l'emplacement de vos dossiers de configuration.
+2. Demande l'adresse de votre serveur LM Studio (par défaut `http://127.0.0.1:1234`).
+3. Vous propose de configurer automatiquement un ou l'ensemble des clients MCP installés :
+   - **Claude Desktop**
+   - **Cursor IDE**
+   - **Antigravity / Gemini CLI**
+4. Teste immédiatement la connectivité avec LM Studio.
+
+### Mode Automatisé / Non-Interactif (CI / Déploiement silencieux)
+```bash
+# Configuration silencieuse avec les valeurs par défaut pour tous les clients :
+node scripts/setup.js --yes
+
+# Configuration avec une adresse LM Studio sur le réseau local :
+node scripts/setup.js --yes --url http://192.168.1.50:1234 --model qwen2.5-coder-7b
+
+# Configuration d'un seul client spécifique (ex. Claude Desktop) :
+node scripts/setup.js --yes --client claude
 ```
 
 ---
 
 ## 💻 Utilisation CLI
 
-### Test rapide de connectivité (Health Check)
+### Test de connectivité (Health Check)
 ```bash
 # Test avec l'adresse par défaut (http://127.0.0.1:1234) :
 node dist/index.js --check-health
@@ -93,34 +146,18 @@ Toutes les options sont configurables sans modifier la ligne de commande via un 
 
 ---
 
-## ⚙️ Configuration des Clients MCP
+## ⚙️ Emplacement des Fichiers de Configuration par OS
 
+Si vous préférez configurer vos clients manuellement plutôt que d'utiliser `npm run setup`, voici les chemins standards :
+
+| Client | Linux | macOS | Windows |
+| :--- | :--- | :--- | :--- |
+| **Claude Desktop** | `~/.config/Claude/claude_desktop_config.json` | `~/Library/Application Support/Claude/claude_desktop_config.json` | `%APPDATA%\Claude\claude_desktop_config.json` |
+| **Cursor IDE** | `~/.cursor/mcp.json` | `~/.cursor/mcp.json` | `%USERPROFILE%\.cursor\mcp.json` |
+| **Antigravity / Gemini** | `~/.gemini/config/mcp_config.json` | `~/.gemini/config/mcp_config.json` | `%USERPROFILE%\.gemini\config\mcp_config.json` |
+
+### Exemple de configuration type
 Remplacez `<CHEMIN_VERS_PROJET>` par le chemin absolu du dossier `LMStudio_MCP_Connector` sur votre machine.
-
-### 1. Antigravity / Gemini CLI (`mcp_config.json`)
-Dans le fichier de configuration de vos serveurs MCP (`~/.gemini/config/mcp_config.json` ou au sein de votre projet) :
-```json
-{
-  "mcpServers": {
-    "lmstudio": {
-      "command": "node",
-      "args": [
-        "<CHEMIN_VERS_PROJET>/dist/index.js"
-      ],
-      "env": {
-        "LMSTUDIO_API_URL": "http://127.0.0.1:1234"
-      },
-      "disabled": false
-    }
-  }
-}
-```
-
-### 2. Claude Desktop (`claude_desktop_config.json`)
-Emplacement :
-- **Windows** : `%APPDATA%\Claude\claude_desktop_config.json`
-- **macOS** : `~/Library/Application Support/Claude/claude_desktop_config.json`
-- **Linux** : `~/.config/Claude/claude_desktop_config.json`
 
 ```json
 {
@@ -132,24 +169,6 @@ Emplacement :
         "--url",
         "http://127.0.0.1:1234"
       ]
-    }
-  }
-}
-```
-
-### 3. Cursor (`mcp.json`)
-Dans le panneau des paramètres MCP de Cursor :
-```json
-{
-  "mcpServers": {
-    "lmstudio": {
-      "command": "node",
-      "args": [
-        "<CHEMIN_VERS_PROJET>/dist/index.js"
-      ],
-      "env": {
-        "LMSTUDIO_API_URL": "http://127.0.0.1:1234"
-      }
     }
   }
 }
@@ -169,9 +188,17 @@ LMStudio_MCP_Connector/
 │   ├── server.ts             # Serveur MCP Stdio JSON-RPC (initialize, ping, tools/list, tools/call)
 │   ├── index.ts              # Point d'entrée exécutable (CLI, flags, lancement)
 │   └── tests/
-│       ├── config.test.ts    # Tests unitaires du parsing de configuration et des variables d'environnement
+│       ├── config.test.ts    # Tests unitaires du parsing de configuration
+│       ├── setup.test.ts     # Tests multi-OS des chemins et de la fusion de configurations
 │       ├── tools.test.ts     # Tests d'exécution des outils et validation des schémas
 │       └── server.test.ts    # Tests du flux JSON-RPC Stdio
+├── scripts/
+│   ├── setup.js              # Moteur de configuration cross-plateforme (Linux/macOS/Windows)
+│   ├── install.sh            # Lanceur universel POSIX (Linux/macOS)
+│   ├── install-linux.sh      # Script d'installation dédié Linux
+│   ├── install-macos.sh      # Script d'installation dédié macOS
+│   ├── install-windows.ps1   # Script d'installation dédié Windows (PowerShell)
+│   └── quality_gate_hook.js  # Quality gate automatique (tsc + tests)
 ├── config/                   # Modèles de configuration prêts à l'emploi
 │   ├── gemini_mcp_config.example.json
 │   ├── claude_desktop_config.example.json
