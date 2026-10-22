@@ -1,35 +1,35 @@
-# Bienvenue sur le Wiki LM Studio MCP Connector
+# Welcome to LM Studio MCP Connector Wiki
 
-> 🤖 **Avertissement / AI Transparency & Disclosure** : Ce projet et l'intégralité de sa documentation ont été conçus, générés et structurés avec l'assistance d'une Intelligence Artificielle (**Google Antigravity** — Modèle : *Gemini 3.8 Flash* & modèles locaux *LM Studio*).
+> 🤖 **AI Transparency & Disclosure**: This project and its complete documentation were architected, generated, and structured with Artificial Intelligence assistance (**Google Antigravity** — Model: *Gemini 3.8 Flash* & *LM Studio Local Models*).
 
-**LM Studio MCP Connector** est un serveur et daemon **Model Context Protocol (MCP)** en TypeScript strict (zéro dépendance runtime) conçu pour interconnecter les plateformes agentiques (**Antigravity**, Claude Desktop, Cursor, Gemini) à des instances locales ou réparties de **LM Studio**.
-
----
-
-## 🧭 Sommaire de la Documentation
-
-1. [Architecture Système v2.0](Architecture-v2) — Vue globale du système, flux de données Stdio/HTTP et pont transparent.
-2. [Multi-Instances & Load Balancing](Multi-Instance-and-Load-Balancing) — Gestion du pool, algorithme *Least-Connections* et routage par rôle (`chat`, `embeddings`).
-3. [Résilience & Repli Distant](Failover-and-Resilience) — Circuit Breaker, bascule transparente et directive de repli distant Antigravity (*Remote Fallback*).
-4. [Dashboard Web & Monitoring](Web-GUI-Dashboard) — Interface Web de monitoring en temps réel, Server-Sent Events (SSE) et API REST.
-5. [Configuration & Déploiement](Configuration-and-Deployment) — Options CLI, variables d'environnement, configuration Antigravity et multi-OS.
-6. [Gouvernance des Agents, Skills & Règles](Skills-Agents-and-Rules) — Standards AGENTS.md, catalogue de skills, transparence IA et Quality Gate.
-7. [Feuille de Route & Évolutions](Roadmap-and-Future-Evolutions) — Prochaines étapes : MCP Prompts prédéfinis et RAG local vectoriel.
+**LM Studio MCP Connector** is a high-performance, strictly typed **Model Context Protocol (MCP)** server and daemon written in TypeScript (with zero runtime dependencies) designed to bridge agentic AI platforms (**Antigravity**, Claude Desktop, Cursor, Gemini) to local or distributed **LM Studio** instances.
 
 ---
 
-## 🌟 Principes Fondamentaux de la Version 2.0.0
+## 🧭 Documentation Index
+
+1. [Architecture Overview v2.0](Architecture-v2) — End-to-end component overview, Stdio/HTTP data flows, and the transparent bridge.
+2. [Multi-Instance & Load Balancing](Multi-Instance-and-Load-Balancing) — PoolManager, Least-Connections load balancing, and role-based routing (`chat`, `embeddings`).
+3. [Resilience & Remote Fallback](Failover-and-Resilience) — Circuit Breaker, seamless failover, and the Antigravity Remote Fallback Directive.
+4. [Web GUI Dashboard](Web-GUI-Dashboard) — Real-time monitoring web dashboard, Server-Sent Events (SSE), and REST API.
+5. [Configuration & Deployment](Configuration-and-Deployment) — CLI options, environment variables, Antigravity integration, and multi-OS installation.
+6. [Governance, Skills & Engineering Rules](Skills-Agents-and-Rules) — AGENTS.md standards, skill catalog, AI disclosure, and automated Quality Gate.
+7. [Roadmap & Future Evolutions](Roadmap-and-Future-Evolutions) — Next milestones: MCP Prompts and Local Vector RAG.
+
+---
+
+## 🌟 Version 2.0.0 Core Principles
 
 ```mermaid
 flowchart LR
-    A["Agent Antigravity / IDE"] -->|"Stdio JSON-RPC"| B["Pont Stdio Intelligent"]
-    B -->|"Detection automatique"| C{"Daemon Actif sur Port 9123 ?"}
-    C -->|"Oui"| D["Daemon HTTP et Pool Manager"]
-    C -->|"Non"| E["Mode Autonome Local"]
-    D -->|"Least-Connections"| F["Pool LM Studio Multi-Machines"]
-    D -.->|"Monitoring SSE"| G["Dashboard Web GUI"]
+    A["Agent Antigravity / IDE"] -->|"Stdio JSON-RPC"| B["Intelligent Stdio Bridge"]
+    B -->|"Automatic Detection"| C{"Daemon Active on Port 9123 ?"}
+    C -->|"Yes"| D["HTTP Daemon and Pool Manager"]
+    C -->|"No"| E["Standalone Local Mode"]
+    D -->|"Least-Connections"| F["Multi-Instance LM Studio Pool"]
+    D -.->|"SSE Monitoring"| G["Web GUI Dashboard"]
 ```
 
-- **Économie Maximale de Tokens Payants** : Déleguer 100% du travail cognitif et du code aux modèles locaux gratuits.
-- **Résilience Totale** : Continuité de service assurée : si toutes les machines locales sont éteintes, Antigravity reçoit immédiatement l'instruction de basculer sur ses LLMs distants.
-- **Zéro Dépendance Runtime** : Conçu exclusivement avec les modules natifs Node.js (`node:http`, `node:events`, `fetch`, `readline`, `AbortController`).
+- **Maximized Free Local Inferences**: Delegate 100% of heavy reasoning and code generation to free local models.
+- **Continuous Resilience**: If all local instances are offline, Antigravity immediately receives instructions to complete tasks using remote LLMs.
+- **Zero Runtime Dependencies**: Exclusively powered by native Node.js APIs (`node:http`, `node:events`, `fetch`, `readline`, `AbortController`).

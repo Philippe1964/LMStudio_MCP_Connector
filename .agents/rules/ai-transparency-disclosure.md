@@ -1,35 +1,34 @@
-# Règle Obligatoire : Avertissement de Génération par IA (AI Transparency & Disclosure)
+# Engineering Standard: Mandatory AI Transparency & Disclosure
 
-Cette règle s'applique systématiquement à **l'ensemble des fichiers** de code source, scripts, documentations, wikis et README du projet `LMStudio_MCP_Connector`.
+This standard applies systematically to **all files** across source code, scripts, documentation, wikis, and README files in the `LMStudio_MCP_Connector` repository.
 
-## 1. Principe Obligatoire
-Toute création ou modification substantielle de fichier par une IA doit comporter un texte d'avertissement explicite indiquant qu'il a été généré / assisté par une Intelligence Artificielle, en précisant le modèle et sa configuration.
+## 1. Mandatory Principle
+Any file created or substantially modified by an AI must include an explicit disclosure notice stating that it was generated/assisted by an Artificial Intelligence, specifying the model and its configuration.
 
-## 2. Formats Standardisés par Type de Fichier
+## 2. Standardized Templates by File Type
 
-### A. Fichiers Markdown (README.md, wiki/*.md, docs/*.md)
-À placer en en-tête ou dans un bloc d'alerte bien visible :
+### A. Markdown Files (`README.md`, `wiki/*.md`, `docs/*.md`)
+Place at the top of the file or in a visible alert block:
 ```markdown
-> 🤖 **Avertissement / AI Disclosure** : Ce contenu a été généré et structuré avec l'assistance d'une Intelligence Artificielle (Google Antigravity — Modèle : Gemini 3.8 Flash & LM Studio local). Validé par tests et Quality Gate automatisé.
+> 🤖 **AI Transparency & Disclosure**: This content was generated and architected with the assistance of Artificial Intelligence (Google Antigravity — Model: Gemini 3.8 Flash & LM Studio Local Models). Verified by strict Quality Gate.
 ```
 
-### B. Code Source TypeScript & JavaScript (`src/**/*.ts`, `scripts/**/*.js`)
-À placer dans le bloc de commentaire JSDoc en en-tête de chaque fichier :
+### B. TypeScript & JavaScript Source Code (`src/**/*.ts`, `scripts/**/*.js`)
+Include in the top JSDoc comment header of each file:
 ```typescript
 /**
  * [AI-GENERATED FILE]
- * Ce fichier a été généré et structuré avec l'assistance d'une Intelligence Artificielle
- * (Google Antigravity / Gemini 3.8 Flash & LM Studio Local LLM).
- * Vérifié et validé par le Quality Gate strict (TypeScript strict, suites de tests).
+ * This file was generated and architected with the assistance of AI
+ * (Google Antigravity / Gemini 3.8 Flash & LM Studio Local LLMs).
+ * Verified and validated by automated strict Quality Gate (TypeScript strict, test suites).
  */
 ```
 
-### C. Scripts Shell & PowerShell (`scripts/*.sh`, `scripts/*.ps1`)
-En commentaire d'en-tête :
+### C. Shell & PowerShell Scripts (`scripts/*.sh`, `scripts/*.ps1`)
+Include in the top script comment header:
 ```bash
 # [AI-GENERATED FILE] Generated with AI assistance (Google Antigravity / Gemini 3.8 Flash & LM Studio).
 ```
 ```powershell
 # [AI-GENERATED FILE] Generated with AI assistance (Google Antigravity / Gemini 3.8 Flash & LM Studio).
 ```
-

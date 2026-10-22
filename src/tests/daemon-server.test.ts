@@ -1,6 +1,6 @@
 /**
  * [AI-GENERATED FILE]
- * Ce fichier de tests a été généré avec l'assistance d'une Intelligence Artificielle
+ * This test suite was generated with the assistance of AI
  * (Google Antigravity / Gemini 3.8 Flash & LM Studio local).
  */
 
@@ -35,7 +35,7 @@ test("DaemonServer exposes Web GUI, REST status API and JSON-RPC /mcp endpoint",
     assert.match(guiRes.headers.get("content-type") || "", /text\/html/);
     const html = await guiRes.text();
     assert.ok(html.includes("LM Studio MCP Connector"));
-    assert.ok(html.includes("ALERTE REPLI"));
+    assert.ok(html.includes("REMOTE FALLBACK ACTIVE"));
 
     // 2. REST API /api/status
     const statusRes = await fetch(`http://127.0.0.1:${testPort}/api/status`);

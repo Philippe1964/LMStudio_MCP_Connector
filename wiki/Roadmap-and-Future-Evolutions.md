@@ -1,60 +1,60 @@
-# Feuille de Route & Évolutions Futures
+# Roadmap & Future Evolutions
 
-> 🤖 **Avertissement / AI Transparency & Disclosure** : Document d'architecture généré avec l'assistance d'une Intelligence Artificielle (Google Antigravity / Gemini 3.8 Flash & LM Studio).
+> 🤖 **AI Transparency & Disclosure**: Architectural documentation generated with Artificial Intelligence assistance (Google Antigravity / Gemini 3.8 Flash & LM Studio).
 
-Cette page documente les axes d'évolutions prioritaires planifiés pour le connecteur, dans l'objectif continu de minimiser la consommation de crédits payants pour les plateformes agentiques.
+This page outlines the planned future milestones for the connector, focusing on continuous reduction of paid token consumption for agentic workflows.
 
 ---
 
-## 🗺️ Matrice des Chantiers
+## 🗺️ Milestone Matrix
 
 ```mermaid
 flowchart LR
-    subgraph V2["Version 2.0 (Actuel)"]
+    subgraph V2["Version 2.0 (Completed)"]
         direction TB
-        V2A["Mode Daemon et Web GUI"]
-        V2B["Multi-Instances et Load Balancing"]
-        V2C["Pont Transparent Stdio/Daemon"]
-        V2D["Directive Repli Distant Antigravity"]
+        V2A["Daemon Mode and Web GUI"]
+        V2B["Multi-Instance Load Balancing"]
+        V2C["Transparent Stdio/Daemon Bridge"]
+        V2D["Antigravity Remote Fallback Directive"]
     end
 
-    subgraph Suivant["Chantiers Suivants"]
+    subgraph Next["Upcoming Milestones"]
         direction TB
-        A["A. MCP Prompts Predefinis"]
-        C["C. RAG et Memoire Vectorielle"]
+        A["A. Predefined MCP Prompts"]
+        C["C. Local Vector RAG and Memory"]
     end
 
-    V2 --> Suivant
+    V2 --> Next
 ```
 
-| Chantier | Statut | Description |
+| Milestone | Status | Description |
 | :--- | :--- | :--- |
-| **Version 2.0 Core** | ✅ Terminé | Mode Daemon, GUI Web temps réel, Multi-Instances, Failover et Fallback transparent. |
-| **A. MCP Prompts Prédéfinis** | 🔄 Prêt à démarrer | Gabarits de code/tests/refactoring DDD réduisant les tokens de prompt. |
-| **C. RAG & Mémoire Vectorielle** | 📅 Planifié | Store vectoriel local avec partitionnement par modèle d'embeddings. |
+| **Version 2.0 Core** | ✅ Completed | Daemon mode, live Web GUI, multi-instance pool, failover, and transparent fallback. |
+| **A. Predefined MCP Prompts** | 🔄 Ready to Start | Standardized code review, DDD refactoring, and test generation prompt templates. |
+| **C. Local Vector RAG & Memory** | 📅 Scheduled | Local vector store with model-partitioned collections and multi-instance embedding routing. |
 
 ---
 
-## 1. Chantier A : MCP Prompts Prédéfinis (Prochaine Étape)
+## 1. Milestone A: Predefined MCP Prompts (Next Step)
 
-### Objectif
-Permettre aux orchestrateurs (Antigravity, Gemini, Claude) d'invoquer des gabarits de prompts spécialisés et optimisés pour les modèles locaux sans consommer de tokens d'orchestration pour formuler les consignes.
+### Objective
+Provide standard MCP prompt templates (`prompts/list` and `prompts/get`) so calling agents (Antigravity, Gemini, Claude) can trigger pre-optimized prompt templates for local models without spending remote tokens authoring verbose instructions.
 
-### Prompts Envisagés
-- `review-code` : Analyse qualité, recherche de bugs et respect des normes avec paramètres `code` et `language`.
-- `refactor-clean-code-ddd` : Restructuration de code selon les patterns DDD et Clean Architecture.
-- `generate-unit-tests` : Génération complète de tests unitaires pour une fonction ou une classe.
-- `diagnose-compiler-error` : Analyse des erreurs de compilation TypeScript/Python et proposition de correctif immédiat.
+### Planned Prompts
+- `review-code`: Comprehensive code review and bug inspection with `code` and `language` arguments.
+- `refactor-clean-code-ddd`: Architectural refactoring following Clean Architecture and DDD standards.
+- `generate-unit-tests`: Complete unit test suite generation for a specified class or module.
+- `diagnose-compiler-error`: Rapid diagnosis of TypeScript or Python compiler errors with concrete patches.
 
 ---
 
-## 2. Chantier C : RAG & Mémoire Vectorielle Locale
+## 2. Milestone C: Local Vector RAG & Memory
 
-### Objectif
-Fournir aux agents un outil MCP d'indexation vectorielle du code et de recherche sémantique locale sans faire transiter de gros volumes de code à travers le modèle distant.
+### Objective
+Equip agents with native tools to index codebase files into vector embeddings and perform local semantic search without transmitting large codebases to remote cloud LLMs.
 
-### Spécifications Clés
-- **Stockage léger sans dépendance externe** (SQLite natif `node:sqlite` ou store JSON persistant).
-- **Partitionnement par modèle d'embedding** : Chaque collection d'index est liée au modèle qui l'a créée (`collection.model_id`) pour éviter les incohérences dimensionnelles lors des changements dynamiques de modèle.
-- **Délégation multi-instances** : Les requêtes d'indexation vectorielle utilisent l'instance du pool taggée avec le rôle `embeddings`, garantissant que les calculs de vecteurs ne ralentissent pas la génération de code.
-- **Outils MCP dédiés** : `lmstudio_rag_index` et `lmstudio_rag_search`.
+### Key Specifications
+- **Zero Third-Party Database Dependencies**: Built on lightweight native storage (`node:sqlite` or persistent JSON vector store).
+- **Partitioning by Embedding Model**: Vector collections are strictly tied to their generating model ID (`collection.model_id`) to prevent vector space corruption when models change.
+- **Multi-Instance Capability Routing**: Embedding generation is delegated to instances tagged with the `embeddings` role, keeping code completion instances responsive.
+- **Dedicated MCP Tools**: `lmstudio_rag_index` and `lmstudio_rag_search`.

@@ -1,27 +1,27 @@
-# Règle Obligatoire : Délégation Maximale au LLM Local Gratuit LM Studio (Économie de Tokens)
+# Mandatory Rule: Maximized Delegation to Free Local LM Studio LLM (Token Optimization)
 
-Cette règle s'applique à l'agent principal ainsi qu'à **tous les sous-agents** intervenant dans ce workspace pour réduire au strict minimum la consommation de tokens distants payants.
+This rule applies to the primary agent and **all subagents** operating within this workspace to minimize paid remote token consumption.
 
-## 1. Principe Zéro Token Payant Inutile
-Le modèle local hébergé sur LM Studio (accessible sur `http://127.0.0.1:1234` ou l'adresse configurée) offre des inférences **gratuites, illimitées et locales**.
-Le modèle cloud payant ne doit servir que de chef d'orchestre léger et de validateur final.
+## 1. Zero Paid Token Waste Principle
+The local model hosted on LM Studio (accessible at `http://127.0.0.1:1234` or the configured address) provides **100% free, unlimited, and confidential** inferences.
+The paid cloud model must act solely as a lightweight orchestrator and final validator.
 
-## 2. Cas d'Usage Obligatoires de Délégation via `lmstudio_chat`
-L'outil MCP `call_mcp_tool(ServerName="lmstudio", ToolName="lmstudio_chat")` doit être appelé avant toute étape lourde :
+## 2. Mandatory Delegation Use Cases via `lmstudio_chat`
+The MCP tool `call_mcp_tool(ServerName="lmstudio", ToolName="lmstudio_chat")` must be queried before executing any heavy cognitive task:
 
-1. **Création & Refactoring de Code** :
-   - Écriture de fonctions, classes, routes FastAPI, composants React 19, requêtes SQL, modèles Pydantic et entités DDD.
-   - Soumettre le prompt de spécification à LM Studio et exploiter son retour pour l'implémentation.
-2. **Résolution de Diagnostics & Erreurs de Test** :
-   - En cas d'erreur `ruff`, `mypy`, `basedpyright`, `tsc` ou `pytest`, transmettre le diagnostic et le code à LM Studio pour obtenir la correction optimale.
-3. **Réflexion Mathématique & Algorithmique** :
-   - Conception des méthodes de calcul de prédiction, statistiques, formules de tirage et probabilités.
-4. **Rédaction de Tests et Scénarios** :
-   - Génération de cas de tests unitaires et d'intégration.
+1. **Code Creation & Refactoring**:
+   - Writing business logic, classes, types, handlers, and unit tests.
+   - Send the specification prompt to LM Studio and adapt its implementation to project standards.
+2. **Diagnostics Resolution & Test Failures**:
+   - When encountering compiler or linter errors (`tsc`, `eslint`, `pytest`), submit the diagnostic and snippet to LM Studio for the optimal fix.
+3. **Algorithmic & Mathematical Reasoning**:
+   - Mathematical modeling, state machine design, edge case scenarios.
+4. **Test Scenarios & Quality Reviews**:
+   - Generating exhaustive test cases and test suites.
 
-## 3. Propagation Systématique aux Sous-Agents
-- **MCP Activé** : Tout sous-agent invoqué ou défini doit posséder les outils MCP (`enable_mcp_tools=true`).
-- **Consigne Injectée** : Dans le prompt de chaque sous-agent, la règle de sollicitation prioritaire de `lmstudio_chat` doit être explicitement inscrite.
-- **Agents Dédiés Disponibles** :
-  - `lmstudio-code-expert` : Pour déléguer la production de code.
-  - `lmstudio-qa-reviewer` : Pour auditer et corriger les erreurs de compilation/linter.
+## 3. Systematic Subagent Propagation
+- **MCP Enabled**: Any subagent invoked or defined must have `enable_mcp_tools=true`.
+- **Injected Directive**: Every subagent prompt must explicitly instruct querying `lmstudio_chat` for cognitive and code generation work.
+- **Dedicated Subagents**:
+  - `lmstudio-code-expert`: Delegated algorithmic and heavy code generation.
+  - `lmstudio-qa-reviewer`: IDE diagnostic auditing and automated fixes.

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * [AI-GENERATED FILE]
- * Ce fichier a été généré et structuré avec l'assistance d'une Intelligence Artificielle
+ * This script was generated with the assistance of AI
  * (Google Antigravity / Gemini 3.8 Flash & LM Studio local).
  *
  * Cross-Platform Setup & Configuration Engine for LM Studio MCP Connector.

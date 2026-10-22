@@ -8,41 +8,42 @@
 [![Version](https://img.shields.io/badge/version-2.0.0-purple.svg)](package.json)
 [![AI Generated](https://img.shields.io/badge/AI%20Assisted-Gemini%203.8%20Flash%20%7C%20LM%20Studio-blueviolet.svg)](.agents/rules/ai-transparency-disclosure.md)
 
-> 🤖 **Avertissement / AI Transparency & Disclosure** : Ce projet, son code source, ses scripts d'installation multi-OS et sa documentation technique ont été conçus et rédigés avec l'assistance d'une Intelligence Artificielle (**Google Antigravity** — Modèles : *Gemini 3.8 Flash* pour l'orchestration et modèles locaux *LM Studio* pour le calcul cognitif). L'ensemble du code est systématiquement testé et validé par un Quality Gate strict.
+> 🤖 **AI Transparency & Disclosure**: This project, its source code, multi-OS installation scripts, and technical documentation were designed and authored with Artificial Intelligence assistance (**Google Antigravity** — Models: *Gemini 3.8 Flash* for orchestration and local *LM Studio* models for cognitive reasoning). All code is systematically tested and validated by a strict Quality Gate.
 
-Un serveur et daemon **Model Context Protocol (MCP)** autonome, moderne et ultra-résilient écrit en **TypeScript** pour connecter n'importe quelle plateforme agentique (Antigravity, Gemini, Claude Desktop, Cursor, VS Code) à une ou plusieurs instances de **LM Studio**.
-
----
-
-## 🌟 Nouveautés de la Version 2.0.0
-
-- 🔀 **Architecture Multi-Instances & Répartition de Charge (Load Balancing)** : Déclarez plusieurs machines ou instances LM Studio (local, réseau LAN, GPU dédié). Les requêtes sont réparties intelligemment selon la charge en cours (*Least-Connections*).
-- 🛡️ **Failover Automatique & Circuit Breaker** : Si une instance sature, timeout ou tombe en panne, le connecteur bascule automatiquement et de manière transparente sur l'instance de secours éligible.
-- ⚡ **Directive de Repli Automatique vers LLM Distant (Antigravity Fallback)** : Si **toutes** les instances locales sont indisponibles, le connecteur retourne un diagnostic explicite (`REMOTE FALLBACK REQUIRED`) ordonnant à l'agent Antigravity de réaliser la tâche via ses modèles distants natifs sans bloquer ni échouer l'exécution.
-- 🖥️ **Mode Daemon HTTP & Dashboard Web Intégré** : Lancez le connecteur en tâche de fond avec `--daemon` pour exposer une interface Web moderne en temps réel (`http://127.0.0.1:9123/`) permettant de monitorer les latences, requêtes en vol, modèles chargés et d'ajouter/supprimer des instances dynamiquement sans redémarrage.
-- 🏷️ **Routage Spécialisé par Rôles** : Attribuez des rôles (`chat`, `embeddings`, `all`) à chaque instance pour réserver par exemple les embeddings à un CPU/GPU rapide sans ralentir la génération de code du gros modèle LLM.
-- ⚡ **Zéro dépendance d'exécution (`zero-runtime dependencies`)** : Toujours 100% natif Node.js (`fetch`, `readline`, `node:http`, `node:events`, `AbortController`).
+A standalone, modern, ultra-resilient **Model Context Protocol (MCP)** server and daemon written in **TypeScript** to connect any agentic AI platform (Antigravity, Gemini, Claude Desktop, Cursor, VS Code) to one or multiple **LM Studio** instances via Stdio JSON-RPC or HTTP.
 
 ---
 
-## 🛠️ Outils MCP Exposés
+## 🌟 What's New in Version 2.0.0
 
-Le connecteur expose 5 outils standardisés :
+- 🔀 **Multi-Instance Architecture & Load Balancing**: Configure multiple LM Studio machines (local, LAN, dedicated GPU servers). Requests are automatically routed using the **Least-Connections** algorithm.
+- 🛡️ **Automatic Failover & Circuit Breaker**: If an instance times out, experiences connection errors, or shuts down, the connector seamlessly fails over to the next eligible instance.
+- ⚡ **Antigravity Remote Fallback Directive**: If **all** local instances become unavailable, the connector returns a structured diagnostic (`REMOTE FALLBACK REQUIRED`) instructing the calling agent to complete the task using its native remote LLMs without failing the execution.
+- 🖥️ **HTTP Daemon & Embedded Real-Time Web GUI**: Run with `--daemon` to host a web dashboard (`http://127.0.0.1:9123/`) for live monitoring (latency, in-flight requests, loaded models) and hot-reloading instance configurations without restarting.
+- 🌉 **Transparent Stdio Bridge**: Standard Stdio clients automatically detect if the daemon is running and transparently forward requests to it, surfacing live metrics in the Web GUI without changing client configs.
+- 🏷️ **Role-Based Routing**: Assign specialized roles (`chat`, `embeddings`, `all`) to instances (e.g. reserve fast embeddings to a specific machine without stalling heavy code completions).
+- ⚡ **Zero Runtime Dependencies**: Built 100% on native Node.js APIs (`fetch`, `readline`, `node:http`, `node:events`, `AbortController`).
 
-| Outil | Description | Paramètres principaux |
+---
+
+## 🛠️ Exposed MCP Tools
+
+The connector exposes 5 standardized tools:
+
+| Tool | Description | Main Arguments |
 | :--- | :--- | :--- |
-| `lmstudio_chat` | Envoie un prompt ou une instruction au modèle local LM Studio avec auto-détection, load balancing et repli distant si panne totale. | `prompt` (requis), `system_prompt`, `model`, `temperature`, `max_tokens` |
-| `lmstudio_list_models` | Inventorie tous les modèles IA disponibles à travers les instances actives du pool. | *Aucun* |
-| `lmstudio_embeddings` | Calcule les vecteurs d'embeddings pour un texte donné avec le modèle d'embedding configuré. | `input` (requis), `model` |
-| `lmstudio_health` | Vérifie la disponibilité, la latence et les modèles actifs de chaque instance du pool. | *Aucun* |
-| `lmstudio_pool_status` | Fournit un rapport JSON complet du pool : statut, latence, requêtes en vol et taux d'erreurs. | *Aucun* |
+| `lmstudio_chat` | Send a prompt/instruction to the local LM Studio model with auto-detection, load balancing, and remote fallback on complete outage. | `prompt` (required), `system_prompt`, `model`, `temperature`, `max_tokens` |
+| `lmstudio_list_models` | List all AI models available across active instances in the pool. | *None* |
+| `lmstudio_embeddings` | Compute vector embeddings for text using the configured local embedding model. | `input` (required), `model` |
+| `lmstudio_health` | Probe latency, status, and active models across all configured instances. | *None* |
+| `lmstudio_pool_status` | Retrieve a detailed JSON report of pool metrics, in-flight connections, and failover stats. | *None* |
 
 ---
 
-## 🚀 Modes d'Utilisation
+## 🚀 Usage Modes
 
-### 1. Mode Stdio Standard (Direct pour Antigravity / Claude / Cursor)
-Dans vos fichiers de configuration MCP (`mcp_config.json`, `claude_desktop_config.json`, etc.) :
+### 1. Standard Stdio Mode (Direct for Antigravity / Claude / Cursor)
+In your MCP client configuration file (`mcp_config.json`, `claude_desktop_config.json`, etc.):
 ```json
 {
   "mcpServers": {
@@ -58,71 +59,72 @@ Dans vos fichiers de configuration MCP (`mcp_config.json`, `claude_desktop_confi
 }
 ```
 
-### 2. Mode Daemon HTTP avec Dashboard Web
-Lancez le connecteur en daemon autonome :
+### 2. Persistent HTTP Daemon & Web Dashboard
+Run the connector as a background daemon:
 ```bash
 node dist/index.js --daemon --port 9123 --instances "http://127.0.0.1:1234,http://192.168.1.50:1234"
 ```
-- **Dashboard Web interactif** : Ouvrez votre navigateur sur `http://127.0.0.1:9123/`
-- **Endpoint MCP HTTP / RPC** : `POST http://127.0.0.1:9123/mcp`
-- **Flux temps réel SSE** : `GET http://127.0.0.1:9123/api/events`
+- **Web Dashboard**: Open `http://127.0.0.1:9123/` in your browser.
+- **MCP HTTP / RPC Endpoint**: `POST http://127.0.0.1:9123/mcp`
+- **Real-Time SSE Stream**: `GET http://127.0.0.1:9123/api/events`
 
 ---
 
-## 💻 Options de la Ligne de Commande
+## 💻 CLI Options
 
 ```text
 Options:
-  --daemon, -d                   Lance en mode Daemon HTTP & SSE avec Dashboard Web intégré
-  --port, --daemon-port, -p <n>  Port du Daemon HTTP & Web GUI (défaut: 9123 ou $LMSTUDIO_DAEMON_PORT)
-  --instances <urls/json>        Liste des instances LM Studio (séparées par virgule ou JSON)
-  --url, -u <url>                URL de l'instance primaire (défaut: http://127.0.0.1:1234)
-  --model, -m <name>             Modèle chat par défaut ou repli (défaut: auto-détecté)
-  --fallback-chat-model <name>   Alias pour --model
-  --fallback-embed-model <name>  Modèle embedding par défaut (défaut: text-embedding-nomic-embed-text-v1.5)
-  --timeout, -t <ms>             Délai d'expiration HTTP en ms (défaut: 60000)
-  --check-health                 Effectue un test de santé sur toutes les instances et quitte
-  --version, -v                  Affiche le numéro de version (v2.0.0)
-  --help, -h                     Affiche l'aide
+  --daemon, -d                   Run as persistent HTTP & SSE Daemon with embedded Web GUI
+  --port, --daemon-port, -p <n>  Port for HTTP Daemon & Web GUI (default: 9123 or $LMSTUDIO_DAEMON_PORT)
+  --daemon-url <url>             Explicit daemon URL for Stdio proxy (default: auto-detected 9123)
+  --no-proxy, --standalone       Disable daemon proxy bridge and force local standalone execution
+  --instances <urls/json>        Multi-instance list (comma-separated URLs or JSON array)
+  --url, -u <url>                Primary LM Studio API URL (default: http://127.0.0.1:1234)
+  --model, -m <name>             Model to use or fallback chat model (default: auto-detected)
+  --fallback-chat-model <name>   Alias for --model
+  --fallback-embed-model <name>  Fallback embedding model (default: text-embedding-nomic-embed-text-v1.5)
+  --timeout, -t <ms>             HTTP Request timeout in ms (default: 60000)
+  --check-health                 Perform a health check across all instances and exit
+  --version, -v                  Display version number (v2.0.0)
+  --help, -h                     Show help message
 ```
 
-### Format JSON Avancé pour `--instances` ou `LMSTUDIO_INSTANCES`
-Vous pouvez définir des instances avec des rôles et des priorités :
+### Advanced JSON Configuration for `--instances` or `LMSTUDIO_INSTANCES`
 ```json
 [
-  { "id": "local-gpu", "name": "RTX 4090", "url": "http://127.0.0.1:1234", "roles": ["chat"], "priority": 2 },
-  { "id": "lan-embed", "name": "Serveur Embeddings", "url": "http://192.168.1.50:1234", "roles": ["embeddings"], "priority": 1 },
-  { "id": "backup-cpu", "name": "Secours", "url": "http://192.168.1.60:1234", "roles": ["all"], "priority": 1 }
+  { "id": "local-gpu", "name": "Desktop RTX 4090", "url": "http://127.0.0.1:1234", "roles": ["chat"], "priority": 2 },
+  { "id": "lan-embed", "name": "Embedding Server", "url": "http://192.168.1.50:1234", "roles": ["embeddings"], "priority": 1 },
+  { "id": "backup-cpu", "name": "Backup Node", "url": "http://192.168.1.60:1234", "roles": ["all"], "priority": 1 }
 ]
 ```
 
 ---
 
-## 🛡️ Résilience & Repli Automatique vers LLM Distant
+## 🛡️ Resilience & Antigravity Remote Fallback
 
-Lorsque toutes les instances locales LM Studio sont arrêtées ou injoignables :
-1. Le connecteur ne bloque pas la requête et ne plante pas le processus.
-2. L'outil retourne un statut `isError: true` avec la directive explicite :
-   ```
+When all local LM Studio instances are offline or unreachable:
+1. The connector does not hang or crash.
+2. The MCP tool returns `isError: true` with an explicit directive:
+   ```text
    ⚠️ [LM STUDIO OFFLINE - REMOTE FALLBACK REQUIRED]
    No local LM Studio instances are currently reachable.
    Antigravity is instructed to immediately fulfill this user request using its native remote LLM capabilities without failing the turn.
    ```
-3. L'agent Antigravity comprend instantanément qu'il doit exécuter la tâche avec ses capacités natives distantes, assurant une continuité de service totale.
-4. Dès qu'une instance LM Studio redémarre, le healthcheck automatique rétablit son statut `ONLINE` en temps réel.
+3. The calling agent instantly recognizes the condition and fulfills the user request with its native cloud LLM (Gemini, Claude, GPT), ensuring zero workflow interruption.
+4. Once LM Studio is restarted, the background health probe automatically restores `ONLINE` status in real time.
 
 ---
 
-## 🧪 Tests & Quality Gate
+## 🧪 Testing & Automated Quality Gate
 
-Le projet est rigoureusement validé par un Quality Gate automatisé :
+The project is governed by an automated Quality Gate enforcing strict TypeScript typing and native tests:
 ```bash
-# Lancer les vérifications strictes TypeScript et les 27 tests unitaires / intégration :
+# Run TypeScript strict checks and all 29 unit & integration tests:
 node scripts/quality_gate_hook.js --cli
 ```
 
 ---
 
-## 📜 Licence
+## 📜 License
 
-Distribué sous licence **MIT**. Voir [LICENSE](LICENSE) pour plus de détails.
+Distributed under the **MIT License**. See [LICENSE](LICENSE) for details.

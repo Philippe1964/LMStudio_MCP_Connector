@@ -1,8 +1,8 @@
 /**
  * [AI-GENERATED FILE]
- * Ce fichier a été généré et structuré avec l'assistance d'une Intelligence Artificielle
+ * This file was generated and architected with the assistance of AI
  * (Google Antigravity / Gemini 3.8 Flash & LM Studio local).
- * Vérifié et validé par le Quality Gate strict (TypeScript strict, suites de tests).
+ * Verified and validated by automated strict Quality Gate (TypeScript strict, test suites).
  *
  * LM Studio MCP Daemon & Embedded Web GUI Server
  * Zero external runtime dependencies - Built exclusively with node:http
@@ -246,69 +246,69 @@ export class DaemonServer {
         </p>
       </div>
       <div>
-        <button class="btn btn-secondary" onclick="checkAll()">⚡ Healthcheck Rapide</button>
+        <button class="btn btn-secondary" onclick="checkAll()">⚡ Quick Healthcheck</button>
       </div>
     </header>
 
     <div class="banner" id="fallbackBanner">
-      ⚠️ <strong>ALERTE REPLI :</strong> Toutes les instances locales LM Studio sont hors ligne.
-      Antigravity utilise automatiquement ses LLMs distants pour ne jamais bloquer vos requêtes.
+      ⚠️ <strong>REMOTE FALLBACK ACTIVE:</strong> All local LM Studio instances are offline.
+      Antigravity is automatically routing requests to remote LLMs to maintain continuity.
     </div>
 
     <div class="metrics-grid">
       <div class="metric-card">
         <div class="metric-value" id="activeCount">-</div>
-        <div class="metric-label">Instances Actives</div>
+        <div class="metric-label">Active Instances</div>
       </div>
       <div class="metric-card">
         <div class="metric-value" id="inFlightCount">0</div>
-        <div class="metric-label">Requêtes en cours</div>
+        <div class="metric-label">In-Flight Requests</div>
       </div>
       <div class="metric-card">
         <div class="metric-value" id="totalRequests">0</div>
-        <div class="metric-label">Requêtes Traitées (Succès)</div>
+        <div class="metric-label">Processed Requests (OK)</div>
       </div>
       <div class="metric-card">
         <div class="metric-value" id="failedRequests" style="color: var(--danger)">0</div>
-        <div class="metric-label">Erreurs / Failovers</div>
+        <div class="metric-label">Failovers / Errors</div>
       </div>
     </div>
 
     <div class="section-title">
-      <span>Instances LM Studio Configurées</span>
+      <span>Configured LM Studio Instances</span>
     </div>
     <div class="instances-grid" id="instancesGrid">
-      <!-- Rempli dynamiquement -->
+      <!-- Dynamically filled -->
     </div>
 
     <div class="section-title">
-      <span>Ajouter une Nouvelle Instance</span>
+      <span>Add a New Instance</span>
     </div>
     <div class="form-card">
       <form id="addForm" onsubmit="addInstance(event)">
         <div class="form-row">
           <div>
-            <label>Identifiant Unique (ex: gpu-local, lan-server)</label>
+            <label>Unique ID (e.g. gpu-01, lan-server)</label>
             <input type="text" id="instId" required placeholder="gpu-01">
           </div>
           <div>
-            <label>Nom Lisible (optionnel)</label>
-            <input type="text" id="instName" placeholder="PC Fixe RTX 4090">
+            <label>Display Name (optional)</label>
+            <input type="text" id="instName" placeholder="Desktop RTX 4090">
           </div>
           <div>
-            <label>URL Endpoint LM Studio</label>
+            <label>LM Studio Endpoint URL</label>
             <input type="url" id="instUrl" required placeholder="http://127.0.0.1:1234">
           </div>
           <div>
-            <label>Rôle Dédié</label>
+            <label>Dedicated Role</label>
             <select id="instRole">
-              <option value="all">Tous rôles (Chat & Embeddings)</option>
-              <option value="chat">Chat / Code uniquement</option>
-              <option value="embeddings">Embeddings uniquement</option>
+              <option value="all">All Roles (Chat & Embeddings)</option>
+              <option value="chat">Chat / Code Only</option>
+              <option value="embeddings">Embeddings Only</option>
             </select>
           </div>
         </div>
-        <button type="submit" class="btn">＋ Ajouter l'Instance au Pool</button>
+        <button type="submit" class="btn">＋ Add Instance to Pool</button>
       </form>
     </div>
   </div>
@@ -334,7 +334,7 @@ export class DaemonServer {
       if (report.allOffline) {
         banner.style.display = "block";
         globalStatus.className = "badge badge-offline";
-        globalStatus.textContent = "OFFLINE (REPLI DISTANT)";
+        globalStatus.textContent = "OFFLINE (REMOTE FALLBACK)";
       } else {
         banner.style.display = "none";
         globalStatus.className = "badge badge-online";
@@ -362,7 +362,7 @@ export class DaemonServer {
 
         const models = inst.activeModelNames && inst.activeModelNames.length > 0
           ? inst.activeModelNames.map(m => '<span class="model-tag">' + m + '</span>').join("")
-          : '<em style="color:var(--text-muted);font-size:0.8rem">Aucun modèle détecté</em>';
+          : '<em style="color:var(--text-muted);font-size:0.8rem">No models detected</em>';
 
         card.innerHTML = \`
           <div class="instance-header">
@@ -370,20 +370,20 @@ export class DaemonServer {
             <span class="badge \${badgeClass}">\${inst.health}</span>
           </div>
           <div class="instance-url">\${inst.config.url}</div>
-          <div style="font-size:0.8rem; color:var(--text-muted)">Rôles: <strong>\${inst.config.roles.join(", ")}</strong></div>
+          <div style="font-size:0.8rem; color:var(--text-muted)">Roles: <strong>\${inst.config.roles.join(", ")}</strong></div>
           <div class="instance-stats">
-            <div>Latence: <strong>\${inst.metrics.latencyMs || 0} ms</strong></div>
-            <div>En cours: <strong>\${inst.metrics.inFlightRequests || 0}</strong></div>
-            <div>Succès: <strong>\${inst.metrics.totalRequests || 0}</strong></div>
-            <div>Échecs: <strong style="color:var(--danger)">\${inst.metrics.failedRequests || 0}</strong></div>
+            <div>Latency: <strong>\${inst.metrics.latencyMs || 0} ms</strong></div>
+            <div>In-Flight: <strong>\${inst.metrics.inFlightRequests || 0}</strong></div>
+            <div>Success: <strong>\${inst.metrics.totalRequests || 0}</strong></div>
+            <div>Errors: <strong style="color:var(--danger)">\${inst.metrics.failedRequests || 0}</strong></div>
           </div>
           <div>
-            <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:4px;">Modèles chargés :</div>
+            <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:4px;">Loaded Models:</div>
             \${models}
           </div>
           <div style="margin-top:auto; display:flex; gap:8px;">
-            <button class="btn btn-secondary" style="font-size:0.8rem; padding:4px 8px;" onclick="checkInstance('\${inst.config.id}')">Tester</button>
-            <button class="btn btn-danger" style="font-size:0.8rem; padding:4px 8px; margin-left:auto;" onclick="removeInstance('\${inst.config.id}')">Supprimer</button>
+            <button class="btn btn-secondary" style="font-size:0.8rem; padding:4px 8px;" onclick="checkInstance('\${inst.config.id}')">Test</button>
+            <button class="btn btn-danger" style="font-size:0.8rem; padding:4px 8px; margin-left:auto;" onclick="removeInstance('\${inst.config.id}')">Delete</button>
           </div>
         \`;
         container.appendChild(card);
@@ -405,7 +405,7 @@ export class DaemonServer {
     }
 
     async function removeInstance(id) {
-      if (!confirm("Supprimer l'instance " + id + " du pool ?")) return;
+      if (!confirm("Remove instance " + id + " from the pool?")) return;
       await fetch("/api/instances/" + encodeURIComponent(id), { method: "DELETE" });
       await fetchState();
     }

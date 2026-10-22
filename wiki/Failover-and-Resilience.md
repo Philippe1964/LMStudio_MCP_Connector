@@ -1,54 +1,52 @@
-# Résilience, Failover & Repli vers LLM Distant
+# Resilience, Failover & Remote Fallback
 
-> 🤖 **Avertissement / AI Transparency & Disclosure** : Document d'architecture généré avec l'assistance d'une Intelligence Artificielle (Google Antigravity / Gemini 3.8 Flash & LM Studio).
-
-La résilience est au cœur de **LM Studio MCP Connector v2.0**. Une session de pair programming avec un agent IA ne doit jamais s'arrêter brutalement parce qu'une machine locale s'éteint ou redémarre.
+Resilience is a foundational principle of **LM Studio MCP Connector v2.0**. Pair programming sessions with AI agents must never crash or freeze because a local workstation reboots or disconnects.
 
 ---
 
-## 🛡️ Les Niveaux de Protection
+## 🛡️ Protection Lifecycle
 
 ```mermaid
 stateDiagram-v2
-    [*] --> ONLINE: Démarrage / Ping réussi
-    ONLINE --> DEGRADED: 1er échec HTTP / Timeout
-    DEGRADED --> ONLINE: Succès de la requête suivante
-    DEGRADED --> OFFLINE: 3 échecs consécutifs (Circuit Breaker ouvert)
-    OFFLINE --> DEGRADED: Healthcheck de fond détecte un retour en ligne
-    OFFLINE --> [*]: Suppression manuelle
+    [*] --> ONLINE: Startup / Successful ping
+    ONLINE --> DEGRADED: First HTTP error / Timeout
+    DEGRADED --> ONLINE: Subsequent request succeeds
+    DEGRADED --> OFFLINE: 3 consecutive errors (Circuit Breaker opens)
+    OFFLINE --> DEGRADED: Background health probe detects instance recovery
+    OFFLINE --> [*]: Manual removal
 ```
 
 ---
 
-## 1. Failover Automatique Transparent (Machine A ➔ Machine B)
+## 1. Seamless Automatic Failover (Node A ➔ Node B)
 
-Lorsqu'une requête arrive (`executeWithFailover`) :
-1. Le gestionnaire tente d'exécuter l'appel sur l'instance la plus disponible.
-2. Si un incident survient (Machine injoignable, `ECONNREFUSED`, timeout dépassé) :
-   - L'échec est comptabilisé pour cette instance.
-   - Le connecteur logge l'avertissement.
-   - **Il bascule instantanément sur la machine suivante éligible du pool**.
-3. Pour le client (Antigravity ou Claude), la bascule est 100% invisible : la réponse arrive sans message d'erreur.
-
----
-
-## 2. Circuit Breaker & Healthcheck de Fond
-
-- **Seuil d'ouverture** : Si une instance cumule 3 échecs consécutifs (`maxConsecutiveFailures`), son circuit s'ouvre : son statut passe à `OFFLINE`.
-- **Protection des requêtes** : Une instance `OFFLINE` est exclue de l'algorithme d'équilibrage de charge pour ne pas ralentir les requêtes suivantes.
-- **Sonde de réhabilitation** : Un thread périodique en tâche de fond (`healthCheckIntervalMs`, par défaut toutes les 15s) sonde `/v1/models` sur les instances hors ligne. Dès qu'une machine redémarre, son statut repasse automatiquement à `ONLINE`.
+When a request executes (`executeWithFailover`):
+1. The pool manager dispatches the call to the most available candidate instance.
+2. If an error occurs (Connection refused, network timeout, 5xx status):
+   - Failure metrics are recorded for that instance.
+   - A warning is logged to `stderr`.
+   - **The manager immediately retries the request on the next eligible instance in the pool**.
+3. The calling AI client (Antigravity or Claude) experiences zero interruption and receives the valid completion seamlessly.
 
 ---
 
-## 3. Panne Totale & Directive de Repli vers LLM Distant (*Antigravity Remote Fallback*)
+## 2. Circuit Breaker & Background Health Prober
 
-### La Problématique
-Si toutes les machines LM Studio de votre réseau sont éteintes, que doit-il se passer ?
-- **Comportement classique (mauvais)** : Le connecteur freeze avec un timeout infini ou crashe, bloquant complètement Antigravity et forçant l'utilisateur à relancer sa session.
-- **Comportement v2.0 (optimal)** : Le connecteur retourne une directive claire et formelle incitant l'agent à prendre le relais avec ses modèles distants (Gemini, Claude, GPT).
+- **Trip Threshold**: If an instance accumulates 3 consecutive failures (`maxConsecutiveFailures`), the circuit breaker trips and sets the instance to `OFFLINE`.
+- **Worker Protection**: `OFFLINE` instances are excluded from active request routing to prevent adding latency to incoming queries.
+- **Background Prober**: A non-blocking background loop (`healthCheckIntervalMs`, default 15s) continuously polls `/v1/models` on offline instances. Once LM Studio is restarted, the prober automatically restores the instance to `ONLINE`.
 
-### Le Format du Message de Repli
-Dès qu'aucune instance locale n'est disponible, l'outil MCP renvoie `isError: true` avec le texte standardisé :
+---
+
+## 3. Total Outage & Antigravity Remote Fallback Directive
+
+### The Challenge
+What happens if all local LM Studio machines are powered down or unreachable?
+- **Bad Behavior**: The connector hangs indefinitely, causing Antigravity to time out and forcing the developer to restart the session.
+- **v2.0 Behavior**: The connector returns an explicit, structured directive instructing the agent to immediately fallback to its native remote LLMs.
+
+### Fallback Message Specification
+When all local nodes are down, the MCP tool returns `isError: true` containing:
 
 ```text
 ⚠️ [LM STUDIO OFFLINE - REMOTE FALLBACK REQUIRED]
@@ -62,10 +60,9 @@ All 3 LM Studio instances failed for role 'chat':
 • gpu-03 (http://192.168.0.43:1234): fetch failed (EHOSTUNREACH)
 ```
 
-### Comportement de l'Agent Antigravity
-En recevant ce bloc, Antigravity comprend que :
-1. Les modèles locaux gratuits sont temporairement indisponibles.
-2. Il ne doit pas interrompre la tâche de l'utilisateur.
-3. Il doit immédiatement générer le code ou la réponse demandée avec son modèle distant propriétaire.
-4. Dès que vous rallumez LM Studio, le connecteur détecte le retour en ligne et réactive la délégation gratuite locale.
-
+### Agent Response
+Upon receiving this payload, Antigravity understands that:
+1. Free local models are temporarily unavailable.
+2. It must not fail or abort the user's workflow.
+3. It should fulfill the task directly using its remote cloud model (Gemini, Claude, GPT).
+4. Once you bring LM Studio back online, the connector auto-recovers and restores free local delegation.

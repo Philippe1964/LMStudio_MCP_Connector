@@ -1,83 +1,80 @@
-# Dashboard Web & Monitoring en Temps Réel
+# Web GUI Dashboard & Real-Time Monitoring
 
-> 🤖 **Avertissement / AI Transparency & Disclosure** : Document d'architecture généré avec l'assistance d'une Intelligence Artificielle (Google Antigravity / Gemini 3.8 Flash & LM Studio).
-
-Le mode Daemon de **LM Studio MCP Connector v2.0** intègre un serveur Web complet et une Single-Page Application (SPA) responsive servie directement en natif Node.js (zéro framework lourd, zéro dépendance externe).
+The Daemon mode in **LM Studio MCP Connector v2.0** embeds a native HTTP server and a responsive Single-Page Application (SPA) built exclusively with Node.js standard libraries (zero third-party dependencies).
 
 ---
 
-## 🚀 Démarrer le Daemon avec la GUI Web
+## 🚀 Starting the Daemon & Web GUI
 
 ```bash
-# Lancement sur le port 9123 (par défaut) :
+# Launch on default port (9123):
 node dist/index.js --daemon
 
-# Lancement sur un port personnalisé avec plusieurs machines :
+# Launch on custom port with multiple cluster nodes:
 node dist/index.js --daemon --port 9123 --instances "http://127.0.0.1:1234,http://192.168.0.108:1234,http://192.168.0.43:1234"
 ```
 
-Accédez ensuite à l'interface dans votre navigateur :
+Open the dashboard in your web browser:  
 👉 **`http://127.0.0.1:9123/`**
 
 ---
 
-## 🖥️ Fonctionnalités du Dashboard
+## 🖥️ Dashboard Features
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────┐
-│  LM Studio MCP Connector [ ONLINE ]       [ ⚡ Healthcheck Rapide ]   │
+│  LM Studio MCP Connector [ ONLINE ]       [ ⚡ Quick Healthcheck ]     │
 │  Multi-Instance Load Balancer, Circuit Breaker & Fallback Controller  │
 ├────────────────────────────────────────────────────────────────────────┤
 │  [ 3 / 3 ]           [ 0 ]              [ 42 ]             [ 0 ]       │
-│  Inst. Actives    Requêtes en vol    Requêtes OK        Échecs/Bascule │
+│  Active Inst.     In-Flight Req.     Processed Req.     Failovers/Err. │
 ├────────────────────────────────────────────────────────────────────────┤
-│  Instances LM Studio Configurées                                       │
+│  Configured LM Studio Instances                                        │
 │  ┌───────────────────────┐ ┌───────────────────────┐                  │
 │  │ instance-1 [ONLINE]   │ │ gpu-02 [ONLINE]       │                  │
 │  │ http://127.0.0.1:1234 │ │ 192.168.0.108:1234    │                  │
-│  │ Rôles: all            │ │ Rôles: all            │                  │
-│  │ Latence: 3ms          │ │ Latence: 4ms          │                  │
-│  │ Modèles: gemma-4-e4b  │ │ Modèles: gemma-4-e4b  │                  │
-│  │ [Tester]  [Supprimer] │ │ [Tester]  [Supprimer] │                  │
+│  │ Roles: all            │ │ Roles: all            │                  │
+│  │ Latency: 3ms          │ │ Latency: 4ms          │                  │
+│  │ Models: gemma-4-e4b   │ │ Models: gemma-4-e4b   │                  │
+│  │ [Test]      [Delete]  │ │ [Test]      [Delete]  │                  │
 │  └───────────────────────┘ └───────────────────────┘                  │
 ├────────────────────────────────────────────────────────────────────────┤
-│  Ajouter une Nouvelle Instance                                         │
-│  [ ID: gpu-04 ] [ URL: http://192.168.0.50:1234 ] [ Rôle: chat ]       │
-│  [ ＋ Ajouter l'Instance au Pool ]                                     │
+│  Add a New Instance                                                    │
+│  [ ID: gpu-04 ] [ URL: http://192.168.0.50:1234 ] [ Role: chat ]       │
+│  [ ＋ Add Instance to Pool ]                                          │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **Métriques Globales en Temps Réel** :
-   - Nombre d'instances actives sur le total configuré.
-   - Requêtes actuellement en cours de calcul (*in-flight*).
-   - Total des requêtes traitées avec succès.
-   - Compteur d'erreurs et bascules de failover.
-2. **Bandeau d'Alerte de Repli** :
-   - S'affiche en rouge vif si **toutes** les instances locales sont arrêtées, signalant le repli automatique vers les LLMs distants d'Antigravity.
-3. **Cartes d'Instances Détaillées** :
-   - Statut en direct : 🟢 `ONLINE`, 🟡 `DEGRADED`, 🔴 `OFFLINE`.
-   - Latence en millisecondes et modèles actuellement chargés dans la VRAM/RAM de chaque machine.
-   - Bouton de test individuel pour chaque instance.
-4. **Gestion Dynamique à Chaud** :
-   - Formulaire d'ajout d'une nouvelle machine avec son rôle (`all`, `chat`, `embeddings`).
-   - Suppression d'une instance en 1 clic sans devoir redémarrer le daemon ni couper Antigravity.
-5. **Flux Server-Sent Events (SSE)** :
-   - L'interface s'abonne à `/api/events` : chaque modification d'état, nouvelle requête ou changement de santé est poussé instantanément à l'écran sans rechargement de page.
+1. **Real-Time Global Metrics**:
+   - Total active instances over configured nodes.
+   - Live in-flight requests currently being computed by GPUs.
+   - Successful processed requests counter.
+   - Error and automatic failover counters.
+2. **Fallback Alert Banner**:
+   - Displays a prominent red warning whenever **all** local nodes are offline, signaling active Antigravity remote model fallback.
+3. **Detailed Instance Cards**:
+   - Live status badges: 🟢 `ONLINE`, 🟡 `DEGRADED`, 🔴 `OFFLINE`.
+   - Latency in milliseconds and active models loaded in VRAM/RAM for each node.
+   - Individual test button to verify node health on demand.
+4. **Hot Configuration Management**:
+   - Form to add new instances dynamically with dedicated roles (`all`, `chat`, `embeddings`).
+   - One-click instance removal without restarting the daemon or interrupting active MCP sessions.
+5. **Server-Sent Events (SSE)**:
+   - Dashboard automatically subscribes to `/api/events`, receiving state updates and metrics pushes without browser refresh.
 
 ---
 
-## 📡 Endpoints de l'API REST Intégrée
+## 📡 REST API Reference
 
-Le serveur HTTP natif expose les routes suivantes :
+The embedded HTTP server exposes the following endpoints:
 
-| Méthode | Route | Description |
+| Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/` | Page d'accueil du Dashboard Web (HTML/CSS/JS). |
-| `GET` | `/api/status` | Retourne l'état complet du pool, latences et compteurs (JSON). |
-| `POST` | `/api/healthcheck` | Déclenche immédiatement une sonde de santé sur toutes les instances. |
-| `POST` | `/api/instances/:id/check` | Déclenche un test de santé sur une instance spécifique. |
-| `POST` | `/api/instances` | Ajoute ou met à jour une instance (`{ id, name, url, roles, priority }`). |
-| `DELETE` | `/api/instances/:id` | Retire une instance du pool actif. |
-| `GET` | `/api/events` | Flux temps réel Server-Sent Events (SSE) poussant l'état du pool. |
-| `POST` | `/mcp` ou `/rpc` | Point d'entrée HTTP pour requêtes JSON-RPC 2.0 du protocole MCP. |
-
+| `GET` | `/` | Web GUI Dashboard HTML page. |
+| `GET` | `/api/status` | Returns complete pool report, latencies, and metric counters (JSON). |
+| `POST` | `/api/healthcheck` | Triggers an immediate health probe across all instances. |
+| `POST` | `/api/instances/:id/check` | Triggers a health probe for a specific instance. |
+| `POST` | `/api/instances` | Adds or updates an instance (`{ id, name, url, roles, priority }`). |
+| `DELETE` | `/api/instances/:id` | Removes an instance from the pool. |
+| `GET` | `/api/events` | Real-time Server-Sent Events (SSE) stream pushing state changes. |
+| `POST` | `/mcp` or `/rpc` | HTTP endpoint executing MCP JSON-RPC 2.0 requests. |

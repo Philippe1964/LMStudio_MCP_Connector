@@ -1,3 +1,3 @@
 ---
-*LM Studio MCP Connector v2.0.0 — Conçu pour une délégation maximale au LLM local gratuit sans gaspillage de tokens.*  
-*🤖 Documentation et architecture assistées par IA (Google Antigravity / Gemini 3.8 Flash & LM Studio local).*
+*LM Studio MCP Connector v2.0.0 — Engineered for maximized delegation to free local LLMs.*  
+*🤖 Architecture & documentation assisted by AI (Google Antigravity / Gemini 3.8 Flash & Local LM Studio).*

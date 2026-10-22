@@ -1,8 +1,8 @@
 /**
  * [AI-GENERATED FILE]
- * Ce fichier a été généré et structuré avec l'assistance d'une Intelligence Artificielle
+ * This file was generated and architected with the assistance of AI
  * (Google Antigravity / Gemini 3.8 Flash & LM Studio local).
- * Vérifié et validé par le Quality Gate strict (TypeScript strict, suites de tests).
+ * Verified and validated by automated strict Quality Gate (TypeScript strict, test suites).
  *
  * Server Configuration & CLI Arguments Parser
  */

@@ -1,59 +1,57 @@
-# Multi-Instances & Répartition de Charge (Load Balancing)
+# Multi-Instance & Load Balancing
 
-> 🤖 **Avertissement / AI Transparency & Disclosure** : Document d'architecture généré avec l'assistance d'une Intelligence Artificielle (Google Antigravity / Gemini 3.8 Flash & LM Studio).
-
-La version 2.0.0 de **LM Studio MCP Connector** permet d'agréger plusieurs machines ou serveurs exécutant LM Studio dans un cluster virtuel unifié.
+Version 2.0.0 of **LM Studio MCP Connector** aggregates multiple machines and GPUs running LM Studio into a unified, high-availability cluster.
 
 ---
 
-## 🎯 Objectifs de la Répartition
+## 🎯 Objectives
 
-1. **Supprimer le goulot d'étranglement GPU unique** : Répartir les requêtes lourdes (génération de code, revue de refactoring) sur plusieurs GPUs distincts.
-2. **Spécialiser les flux par rôle** : Ne pas bloquer la génération de texte avec des calculs d'embeddings fréquents.
-3. **Zéro configuration complexe** : Pas besoin de Nginx, de HAProxy ou de Kubernetes.
+1. **Eliminate Single-GPU Bottlenecks**: Distribute heavy workloads (large-scale code generation, refactoring, test suites) across multiple GPUs.
+2. **Role Specialization**: Separate fast vector embedding computations from deep code generation tasks.
+3. **Zero Complex Setup**: No Nginx, HAProxy, or Kubernetes required; runs natively on Node.js.
 
 ---
 
-## 🏷️ Définition des Rôles par Instance
+## 🏷️ Role Definitions per Instance
 
-Chaque instance déclarée dans le pool se voit attribuer un ou plusieurs rôles :
+Each instance declared in the pool can be tagged with one or multiple roles:
 
-| Rôle | Description | Outils MCP Routés |
+| Role | Description | Routed MCP Tools |
 | :--- | :--- | :--- |
-| `chat` | Modèles de génération de texte / code (ex: Qwen 2.5 Coder, Gemma, Llama). | `lmstudio_chat` |
-| `embeddings` | Modèles de vectorisation rapide (ex: `nomic-embed-text`, `bge-m3`). | `lmstudio_embeddings` |
-| `all` | Traite indifféremment le chat et les embeddings. | Tous les outils |
+| `chat` | Code and chat completion models (e.g. Qwen 2.5 Coder, Gemma, Llama). | `lmstudio_chat` |
+| `embeddings` | Fast text vectorization models (e.g. `nomic-embed-text`, `bge-m3`). | `lmstudio_embeddings` |
+| `all` | Generalist node handling both chat completions and embeddings. | All tools |
 
 ---
 
-## ⚖️ Algorithme Least-Connections
+## ⚖️ Least-Connections Algorithm
 
-Pour éviter d'envoyer une requête à un GPU déjà à 100% d'utilisation sur une complétion longue, le `PoolManager` applique l'algorithme suivant lors de l'appel `selectCandidates(role)` :
+To prevent sending requests to a GPU already saturated with a long completion, `PoolManager` selects candidates using the following pipeline:
 
 ```mermaid
 flowchart TD
-    A["Requete entrante (lmstudio_chat)"] --> B["Filtrer instances eligibles pour le role chat"]
-    B --> C["Eliminer instances hors-ligne (Circuit Breaker)"]
-    C --> D["Trier par statut de sante (ONLINE > UNKNOWN)"]
-    D --> E["Trier par connexions en vol (Least-Connections)"]
-    E --> F["Trier par priorite configuree"]
-    F --> G["Trier par plus faible latence observee"]
-    G --> H["Selectionner la meilleure instance disponible"]
+    A["Incoming Request (e.g. lmstudio_chat)"] --> B["Filter instances eligible for role 'chat'"]
+    B --> C["Exclude instances with open Circuit Breaker (OFFLINE)"]
+    C --> D["Sort by health status (ONLINE > UNKNOWN / DEGRADED)"]
+    D --> E["Sort by in-flight active connections (inFlightRequests)"]
+    E --> F["Sort by configured priority (priority)"]
+    F --> G["Sort by lowest observed latency (latencyMs)"]
+    G --> H["Select the optimal instance"]
 ```
 
-### Exemple de comportement
-Si `Instance A` traite déjà 1 requête (`inFlightRequests: 1`) et `Instance B` est libre (`inFlightRequests: 0`), la nouvelle requête est immédiatement routée vers `Instance B`.
+### Example Behavior
+If `Instance A` is processing 1 active request (`inFlightRequests: 1`) and `Instance B` is idle (`inFlightRequests: 0`), the new request is dispatched to `Instance B`.
 
 ---
 
-## ⚙️ Configuration Multi-Instances
+## ⚙️ Multi-Instance Configuration
 
-### Via la Ligne de Commande (Format court ou JSON)
+### Via CLI Arguments (Comma-Separated or JSON)
 ```bash
-# Format URLs séparées par des virgules (toutes avec rôle "all") :
+# Comma-separated URLs (all tagged with role "all"):
 node dist/index.js --instances "http://127.0.0.1:1234,http://192.168.0.108:1234,http://192.168.0.43:1234"
 
-# Format JSON avancé (rôles et priorités spécifiques) :
+# Advanced JSON format (custom roles and priorities):
 node dist/index.js --instances '[
   {"id":"gpu-local","url":"http://127.0.0.1:1234","roles":["all"],"priority":2},
   {"id":"gpu-lan-1","url":"http://192.168.0.108:1234","roles":["all"],"priority":1},
@@ -61,10 +59,10 @@ node dist/index.js --instances '[
 ]'
 ```
 
-### Via les Variables d'Environnement (`.env`)
+### Via Environment Variables (`.env`)
 ```env
 LMSTUDIO_INSTANCES=[{"id":"gpu-01","url":"http://127.0.0.1:1234","roles":["all"]},{"id":"gpu-02","url":"http://192.168.0.108:1234","roles":["all"]}]
 ```
 
-### Directement depuis le Dashboard Web
-Sur `http://127.0.0.1:9123/`, remplissez le formulaire "Ajouter une Nouvelle Instance" : l'instance est injectée à chaud dans le pool sans redémarrer le daemon.
+### Via the Embedded Web Dashboard
+Navigate to `http://127.0.0.1:9123/` and use the "Add a New Instance" form: new instances are injected into the active pool with zero downtime.

@@ -1,52 +1,50 @@
-# Configuration & Déploiement Multi-OS
+# Configuration & Multi-OS Deployment
 
-> 🤖 **Avertissement / AI Transparency & Disclosure** : Document d'architecture généré avec l'assistance d'une Intelligence Artificielle (Google Antigravity / Gemini 3.8 Flash & LM Studio).
-
-Ce guide détaille l'ensemble des options de configuration, variables d'environnement et procédures de déploiement pour Linux, macOS et Windows.
+This guide covers all command-line options, environment variables, and client setup procedures for Linux, macOS, and Windows.
 
 ---
 
-## 🛠️ Options de la Ligne de Commande
+## 🛠️ Command-Line Interface (CLI)
 
 ```text
 Options:
-  --daemon, -d                   Lance en mode Daemon HTTP & SSE avec Dashboard Web intégré
-  --port, --daemon-port, -p <n>  Port du Daemon HTTP & Web GUI (défaut: 9123 ou $LMSTUDIO_DAEMON_PORT)
-  --daemon-url <url>             URL explicite du daemon pour le mode Stdio (défaut: auto-détection 9123)
-  --no-proxy, --standalone       Désactive la passerelle vers le daemon et force l'exécution locale
-  --instances <urls/json>        Liste des instances LM Studio (séparées par virgule ou tableau JSON)
-  --url, -u <url>                URL de l'instance primaire (défaut: http://127.0.0.1:1234)
-  --model, -m <name>             Modèle chat par défaut ou repli (défaut: auto-détecté)
-  --fallback-chat-model <name>   Alias pour --model
-  --fallback-embed-model <name>  Modèle embedding par défaut (défaut: text-embedding-nomic-embed-text-v1.5)
-  --timeout, -t <ms>             Délai d'expiration HTTP en ms (défaut: 60000)
-  --check-health                 Effectue un test de santé sur toutes les instances et quitte
-  --version, -v                  Affiche le numéro de version (v2.0.0)
-  --help, -h                     Affiche l'aide
+  --daemon, -d                   Run as persistent HTTP & SSE Daemon with embedded Web GUI
+  --port, --daemon-port, -p <n>  Port for HTTP Daemon & Web GUI (default: 9123 or $LMSTUDIO_DAEMON_PORT)
+  --daemon-url <url>             Explicit daemon URL for Stdio proxy (default: auto-detected 9123)
+  --no-proxy, --standalone       Disable daemon proxy bridge and force local standalone execution
+  --instances <urls/json>        Multi-instance list (comma-separated URLs or JSON array)
+  --url, -u <url>                Primary LM Studio API URL (default: http://127.0.0.1:1234)
+  --model, -m <name>             Model to use or fallback chat model (default: auto-detected)
+  --fallback-chat-model <name>   Alias for --model
+  --fallback-embed-model <name>  Fallback embedding model (default: text-embedding-nomic-embed-text-v1.5)
+  --timeout, -t <ms>             HTTP Request timeout in ms (default: 60000)
+  --check-health                 Perform a health check across all instances and exit
+  --version, -v                  Display version number (v2.0.0)
+  --help, -h                     Show help message
 ```
 
 ---
 
-## 🌍 Variables d'Environnement
+## 🌍 Environment Variables
 
-Toutes les options sont paramétrables via l'environnement ou un fichier `.env` à la racine :
+All parameters can be configured via environment variables or a `.env` file located in the project root:
 
-| Variable | Défaut | Description |
+| Variable | Default | Description |
 | :--- | :--- | :--- |
-| `LMSTUDIO_API_URL` | `http://127.0.0.1:1234` | URL de l'instance LM Studio principale. |
-| `LMSTUDIO_INSTANCES` | *Aucun* | Liste ou tableau JSON de toutes les instances du cluster. |
-| `LMSTUDIO_DAEMON` | `false` | Active le mode daemon au démarrage (`true` ou `1`). |
-| `LMSTUDIO_DAEMON_PORT` | `9123` | Port d'écoute du serveur HTTP et de la Web GUI. |
-| `LMSTUDIO_AUTO_PROXY` | `true` | Détecte et utilise automatiquement le daemon local s'il tourne. |
-| `LMSTUDIO_TIMEOUT_MS` | `60000` | Timeout des requêtes HTTP en millisecondes. |
-| `LMSTUDIO_HEALTH_INTERVAL_MS`| `15000` | Fréquence en ms du healthcheck périodique en tâche de fond. |
+| `LMSTUDIO_API_URL` | `http://127.0.0.1:1234` | Primary LM Studio instance URL. |
+| `LMSTUDIO_INSTANCES` | *None* | Comma-separated list or JSON array of cluster instances. |
+| `LMSTUDIO_DAEMON` | `false` | Enable daemon mode at launch (`true` or `1`). |
+| `LMSTUDIO_DAEMON_PORT` | `9123` | Listening port for HTTP server and Web GUI. |
+| `LMSTUDIO_AUTO_PROXY` | `true` | Automatically detect and proxy Stdio to active local daemon. |
+| `LMSTUDIO_TIMEOUT_MS` | `60000` | HTTP request timeout in milliseconds. |
+| `LMSTUDIO_HEALTH_INTERVAL_MS`| `15000` | Interval in ms for background health polling loop. |
 
 ---
 
-## 🔌 Intégration dans les Clients MCP
+## 🔌 MCP Client Configuration
 
 ### Antigravity & Gemini CLI
-Chemin de configuration : `~/.gemini/config/mcp_config.json` (ou `%USERPROFILE%\.gemini\config\mcp_config.json`) :
+Configuration path: `~/.gemini/config/mcp_config.json` (or `%USERPROFILE%\.gemini\config\mcp_config.json` on Windows):
 
 ```json
 {
@@ -63,10 +61,10 @@ Chemin de configuration : `~/.gemini/config/mcp_config.json` (ou `%USERPROFILE%\
   }
 }
 ```
-*Note : Grâce au pont transparent, le connecteur détecte automatiquement le daemon sur le port 9123. S'il est allumé, vos requêtes transitent par le pool et s'affichent sur le dashboard !*
+*Note: The transparent bridge automatically attaches to the daemon on port 9123 if running, routing requests across your multi-instance pool and updating your Web Dashboard live.*
 
 ### Claude Desktop
-Chemin : `%APPDATA%\Claude\claude_desktop_config.json` (Windows) ou `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) :
+Path: `%APPDATA%\Claude\claude_desktop_config.json` (Windows) or `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS):
 
 ```json
 {
@@ -74,7 +72,7 @@ Chemin : `%APPDATA%\Claude\claude_desktop_config.json` (Windows) ou `~/Library/A
     "lmstudio": {
       "command": "node",
       "args": [
-        "/absolu/vers/LMStudio_MCP_Connector/dist/index.js"
+        "/absolute/path/to/LMStudio_MCP_Connector/dist/index.js"
       ]
     }
   }
@@ -82,7 +80,7 @@ Chemin : `%APPDATA%\Claude\claude_desktop_config.json` (Windows) ou `~/Library/A
 ```
 
 ### Cursor IDE
-Chemin : `~/.cursor/mcp.json` :
+Path: `~/.cursor/mcp.json`:
 
 ```json
 {
@@ -90,10 +88,9 @@ Chemin : `~/.cursor/mcp.json` :
     "lmstudio": {
       "command": "node",
       "args": [
-        "/absolu/vers/LMStudio_MCP_Connector/dist/index.js"
+        "/absolute/path/to/LMStudio_MCP_Connector/dist/index.js"
       ]
     }
   }
 }
 ```
-

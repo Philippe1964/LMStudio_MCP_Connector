@@ -1,82 +1,82 @@
-# Architecture Système — Version 2.0.0
+# System Architecture — Version 2.0.0
 
-> 🤖 **Avertissement / AI Transparency & Disclosure** : Document d'architecture généré avec l'assistance d'une Intelligence Artificielle (Google Antigravity / Gemini 3.8 Flash & LM Studio).
+> 🤖 **AI Transparency & Disclosure**: Architectural documentation generated with Artificial Intelligence assistance (Google Antigravity / Gemini 3.8 Flash & LM Studio).
 
-Ce document détaille l'architecture modulaire de **LM Studio MCP Connector v2.0**, basée sur une séparation stricte des responsabilités et une conception **zéro dépendance externe**.
+This document details the modular architecture of **LM Studio MCP Connector v2.0**, designed around clean separation of concerns and **zero external runtime dependencies**.
 
 ---
 
-## 🏛️ Vue d'Ensemble des Composants
+## 🏛️ Component Architecture Overview
 
 ```mermaid
 flowchart TD
-    subgraph Clients["Clients et Consommateurs MCP"]
+    subgraph Clients["MCP Clients and Consumers"]
         AGY["Antigravity IDE / Agent"]
         IDE["Cursor / Claude Desktop"]
-        NAV["Navigateur Web - Dashboard"]
+        NAV["Web Browser - Dashboard"]
     end
 
     subgraph Connector["LM Studio MCP Connector Core"]
         Bridge["Stdio JSON-RPC Handler (server.ts)"]
         Probe["Daemon Auto-Detector (probeDaemon)"]
-        Daemon["HTTP et SSE Daemon Server (Port 9123)"]
-        Router["JSON-RPC Dispatcher et Tools Catalog"]
+        Daemon["HTTP and SSE Daemon Server (Port 9123)"]
+        Router["JSON-RPC Dispatcher and Tools Catalog"]
         Pool["Multi-Instance Pool Manager (pool-manager.ts)"]
         LB["Least-Connections Load Balancer"]
-        CB["Circuit Breaker et Health Poller"]
+        CB["Circuit Breaker and Health Poller"]
     end
 
-    subgraph Cluster["Instances LM Studio Réparties"]
-        LM1["Instance Locale GPU 1 - 127.0.0.1:1234"]
-        LM2["Machine Reseau LAN GPU 2 - 192.168.0.108:1234"]
-        LM3["Serveur Dedie GPU 3 - 192.168.0.43:1234"]
+    subgraph Cluster["Distributed LM Studio Instances"]
+        LM1["Local Instance GPU 1 - 127.0.0.1:1234"]
+        LM2["LAN Network Node GPU 2 - 192.168.0.108:1234"]
+        LM3["Dedicated Node GPU 3 - 192.168.0.43:1234"]
     end
 
-    AGY -->|"Flux Stdio"| Bridge
-    IDE -->|"Flux Stdio"| Bridge
+    AGY -->|"Stdio stream"| Bridge
+    IDE -->|"Stdio stream"| Bridge
     Bridge --> Probe
-    Probe -->|"Si Daemon actif sur port 9123"| Daemon
-    Probe -->|"Si Daemon inactif (Mode autonome)"| Router
+    Probe -->|"If Daemon active on port 9123"| Daemon
+    Probe -->|"If Daemon offline (Standalone)"| Router
 
-    NAV -->|"HTTP GET et SSE events"| Daemon
+    NAV -->|"HTTP GET and SSE events"| Daemon
 
     Daemon --> Router
     Router --> Pool
     Pool --> LB
     Pool --> CB
-    LB -->|"Routage optimal"| LM1
-    LB -->|"Routage optimal"| LM2
-    LB -->|"Routage optimal"| LM3
+    LB -->|"Optimal route"| LM1
+    LB -->|"Optimal route"| LM2
+    LB -->|"Optimal route"| LM3
 ```
 
 ---
 
-## 🔄 Flux d'Exécution & Pont Transparent (Stdio ➔ Daemon)
+## 🔄 Execution Flow & Transparent Bridge (Stdio ➔ Daemon)
 
-Le problème classique des connecteurs MCP est que chaque client (Antigravity, Cursor) lance son propre processus indépendant en arrière-plan. Cela empêche de partager des métriques, de centraliser le load balancing ou d'observer les flux.
+Standard MCP servers run as isolated child processes for each client application. This prevents shared in-flight connection tracking, cluster-wide load balancing, and unified observability.
 
-La version 2.0 résout cela grâce à son **pont transparent** :
+Version 2.0 solves this via its **transparent bridge**:
 
-1. Antigravity lance la commande standard `node dist/index.js`.
-2. Au démarrage, `McpServer.probeDaemon("http://127.0.0.1:9123")` envoie un ping HTTP ultra-rapide (timeout 300ms).
-3. **Cas A : Le daemon tourne en arrière-plan** :
-   - Le sous-processus Stdio s'abonne au daemon.
-   - Toute requête JSON-RPC (`initialize`, `tools/call`) est immédiatement transmise à `http://127.0.0.1:9123/mcp`.
-   - Le daemon exécute la requête dans le pool multi-machines partagé et notifie en temps réel le Dashboard Web via Server-Sent Events (SSE).
-4. **Cas B : Aucun daemon n'est lancé** :
-   - Le connecteur bascule instantanément en mode autonome avec son propre gestionnaire de pool local.
+1. Antigravity spawns the standard command: `node dist/index.js`.
+2. On startup, `McpServer.probeDaemon("http://127.0.0.1:9123")` sends a rapid HTTP probe (300ms timeout).
+3. **Scenario A: The Daemon is running in the background**:
+   - The Stdio process attaches to the active daemon.
+   - Any JSON-RPC request (`initialize`, `tools/call`) is proxied over HTTP to `http://127.0.0.1:9123/mcp`.
+   - The daemon executes the tool call across the shared multi-instance pool and broadcasts metrics via Server-Sent Events (SSE) to the Web Dashboard in real time.
+4. **Scenario B: No Daemon is running**:
+   - The connector runs immediately in standalone mode using its own local pool manager.
 
 ---
 
-## 📦 Organisation Modulaire du Code
+## 📦 Modular Codebase Structure
 
-| Fichier source | Rôle Architectural |
+| Source File | Architectural Responsibility |
 | :--- | :--- |
-| `src/types.ts` | Contrats TypeScript stricts : JSON-RPC 2.0, DTOs LM Studio, interfaces du Pool et constantes de repli. |
-| `src/config.ts` | Résolution unifiée des flags CLI, des variables d'environnement (`.env`) et parsing d'instances. |
-| `src/lmstudio-client.ts` | Client HTTP natif (`fetch`, `AbortController`) avec sondes de latence et auto-détection des modèles. |
-| `src/pool-manager.ts` | Orchestrateur de résilience : registre des instances, équilibrage *Least-Connections*, failover et circuit breaker. |
-| `src/tools.ts` | Catalogue des 5 outils MCP (`lmstudio_chat`, `lmstudio_health`, etc.) et logique d'exécution sécurisée. |
-| `src/server.ts` | Serveur Stdio JSON-RPC avec support du proxy HTTP transparent. |
-| `src/daemon-server.ts` | Serveur HTTP/SSE natif (`node:http`) hébergeant l'API REST, le point d'entrée MCP HTTP et la GUI Web. |
-| `src/index.ts` | Point d'entrée exécutable (CLI, `--daemon`, `--check-health`, stdio bridge). |
+| `src/types.ts` | Strict TypeScript contracts: JSON-RPC 2.0, LM Studio DTOs, Pool interfaces, and fallback directives. |
+| `src/config.ts` | Unified CLI flag parser, `.env` file resolution, and multi-instance parser. |
+| `src/lmstudio-client.ts` | Isolated native HTTP client (`fetch`, `AbortController`) with health checks and dynamic model detection. |
+| `src/pool-manager.ts` | Core resilience engine: instance registry, Least-Connections load balancer, failover, and Circuit Breaker. |
+| `src/tools.ts` | Catalog of 5 MCP tools (`lmstudio_chat`, `lmstudio_health`, etc.) and safe execution handlers. |
+| `src/server.ts` | Stdio JSON-RPC server with transparent HTTP daemon forwarding bridge. |
+| `src/daemon-server.ts` | Native HTTP & SSE server (`node:http`) serving REST APIs, the `/mcp` RPC endpoint, and the embedded Web GUI. |
+| `src/index.ts` | CLI entry point, argument router, and process lifecycle manager. |

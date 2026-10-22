@@ -1,17 +1,17 @@
 ### Documentation Wiki
 
-- [Accueil](Home)
+- [Home](Home)
 - [Architecture v2.0](Architecture-v2)
-- [Multi-Instances & Load Balancing](Multi-Instance-and-Load-Balancing)
-- [Résilience & Repli Distant](Failover-and-Resilience)
-- [Dashboard Web & Monitoring](Web-GUI-Dashboard)
-- [Configuration & Déploiement](Configuration-and-Deployment)
-- [Gouvernance, Skills & Règles](Skills-Agents-and-Rules)
-- [Feuille de Route](Roadmap-and-Future-Evolutions)
+- [Multi-Instance & Load Balancing](Multi-Instance-and-Load-Balancing)
+- [Resilience & Remote Fallback](Failover-and-Resilience)
+- [Web GUI Dashboard](Web-GUI-Dashboard)
+- [Configuration & Deployment](Configuration-and-Deployment)
+- [Governance, Skills & Rules](Skills-Agents-and-Rules)
+- [Roadmap & Future Evolutions](Roadmap-and-Future-Evolutions)
 
 ---
 
-### Liens Utiles
-- [Dépôt GitHub](https://github.com/Philippe1964/LMStudio_MCP_Connector)
-- [Spécification MCP](https://modelcontextprotocol.io/)
-- [Site Officiel LM Studio](https://lmstudio.ai/)
+### External Links
+- [GitHub Repository](https://github.com/Philippe1964/LMStudio_MCP_Connector)
+- [MCP Specification](https://modelcontextprotocol.io/)
+- [LM Studio Official Site](https://lmstudio.ai/)

@@ -1,6 +1,6 @@
 /**
  * [AI-GENERATED FILE]
- * Ce fichier de tests a été généré avec l'assistance d'une Intelligence Artificielle
+ * This test suite was generated with the assistance of AI
  * (Google Antigravity / Gemini 3.8 Flash & LM Studio local).
  */
 
