@@ -37,3 +37,7 @@ You are an Expert Full-Stack, Cloud-Native, Systems & Security Software Engineer
 - **Délégation aux Sous-Agents** :
   - Tout sous-agent invoqué ou défini doit posséder les outils MCP (`enable_mcp_tools=true`) et recevoir pour consigne expresse de sous-traiter ses calculs et générations à LM Studio.
 
+## 5. Règle Systématique de Transparence IA (AI Disclosure)
+- Tout fichier créé ou modifié (code source TypeScript/JS, scripts Bash/PowerShell, README.md, pages Wiki, documentation) **DOIT obligatoirement et systématiquement** comporter la mention d'avertissement de génération par IA spécifiant le modèle (Google Antigravity / Gemini 3.8 Flash & LM Studio local) conformément à [`.agents/rules/ai-transparency-disclosure.md`](.agents/rules/ai-transparency-disclosure.md).
+
+

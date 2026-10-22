@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 /**
+ * [AI-GENERATED FILE]
+ * Ce script a été généré avec l'assistance d'une Intelligence Artificielle
+ * (Google Antigravity / Gemini 3.8 Flash & LM Studio local).
+ *
  * Script de synchronisation automatique du dossier wiki/ vers le Wiki GitHub
  * Usage: node scripts/sync-wiki.js
  */

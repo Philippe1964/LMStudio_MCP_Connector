@@ -1,5 +1,7 @@
 # Architecture Système — Version 2.0.0
 
+> 🤖 **Avertissement / AI Transparency & Disclosure** : Document d'architecture généré avec l'assistance d'une Intelligence Artificielle (Google Antigravity / Gemini 3.8 Flash & LM Studio).
+
 Ce document détaille l'architecture modulaire de **LM Studio MCP Connector v2.0**, basée sur une séparation stricte des responsabilités et une conception **zéro dépendance externe**.
 
 ---

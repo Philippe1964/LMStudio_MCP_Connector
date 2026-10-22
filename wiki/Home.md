@@ -1,5 +1,7 @@
 # Bienvenue sur le Wiki LM Studio MCP Connector
 
+> 🤖 **Avertissement / AI Transparency & Disclosure** : Ce projet et l'intégralité de sa documentation ont été conçus, générés et structurés avec l'assistance d'une Intelligence Artificielle (**Google Antigravity** — Modèle : *Gemini 3.8 Flash* & modèles locaux *LM Studio*).
+
 **LM Studio MCP Connector** est un serveur et daemon **Model Context Protocol (MCP)** en TypeScript strict (zéro dépendance runtime) conçu pour interconnecter les plateformes agentiques (**Antigravity**, Claude Desktop, Cursor, Gemini) à des instances locales ou réparties de **LM Studio**.
 
 ---

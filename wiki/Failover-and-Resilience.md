@@ -1,5 +1,7 @@
 # Résilience, Failover & Repli vers LLM Distant
 
+> 🤖 **Avertissement / AI Transparency & Disclosure** : Document d'architecture généré avec l'assistance d'une Intelligence Artificielle (Google Antigravity / Gemini 3.8 Flash & LM Studio).
+
 La résilience est au cœur de **LM Studio MCP Connector v2.0**. Une session de pair programming avec un agent IA ne doit jamais s'arrêter brutalement parce qu'une machine locale s'éteint ou redémarre.
 
 ---

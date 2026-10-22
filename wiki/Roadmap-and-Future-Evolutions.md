@@ -1,5 +1,7 @@
 # Feuille de Route & Évolutions Futures
 
+> 🤖 **Avertissement / AI Transparency & Disclosure** : Document d'architecture généré avec l'assistance d'une Intelligence Artificielle (Google Antigravity / Gemini 3.8 Flash & LM Studio).
+
 Cette page documente les axes d'évolutions prioritaires planifiés pour le connecteur, dans l'objectif continu de minimiser la consommation de crédits payants pour les plateformes agentiques.
 
 ---

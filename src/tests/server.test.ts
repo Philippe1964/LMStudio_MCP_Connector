@@ -1,3 +1,9 @@
+/**
+ * [AI-GENERATED FILE]
+ * Ce fichier de tests a été généré avec l'assistance d'une Intelligence Artificielle
+ * (Google Antigravity / Gemini 3.8 Flash & LM Studio local).
+ */
+
 import test from "node:test";
 import assert from "node:assert/strict";
 import http from "node:http";

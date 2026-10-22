@@ -1,5 +1,7 @@
 # Dashboard Web & Monitoring en Temps Réel
 
+> 🤖 **Avertissement / AI Transparency & Disclosure** : Document d'architecture généré avec l'assistance d'une Intelligence Artificielle (Google Antigravity / Gemini 3.8 Flash & LM Studio).
+
 Le mode Daemon de **LM Studio MCP Connector v2.0** intègre un serveur Web complet et une Single-Page Application (SPA) responsive servie directement en natif Node.js (zéro framework lourd, zéro dépendance externe).
 
 ---

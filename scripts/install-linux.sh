@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# [AI-GENERATED FILE] Generated with AI assistance (Google Antigravity / Gemini 3.8 Flash & LM Studio).
 # ==============================================================================
 # LM Studio MCP Connector - Linux Dedicated Installer & Configurator
 # Compatible with Ubuntu, Debian, Fedora, CentOS, Arch, openSUSE, Alpine, etc.

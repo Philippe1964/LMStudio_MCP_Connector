@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# [AI-GENERATED FILE] Generated with AI assistance (Google Antigravity / Gemini 3.8 Flash & LM Studio).
 # ==============================================================================
 # LM Studio MCP Connector - Universal POSIX Installer (Linux & macOS)
 # Auto-detects operating system and launches dedicated installer

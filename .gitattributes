@@ -5,3 +5,4 @@ scripts/* text eol=lf
 
 # PowerShell scripts
 *.ps1 text eol=crlf
+

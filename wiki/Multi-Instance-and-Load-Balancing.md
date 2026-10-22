@@ -1,5 +1,7 @@
 # Multi-Instances & Répartition de Charge (Load Balancing)
 
+> 🤖 **Avertissement / AI Transparency & Disclosure** : Document d'architecture généré avec l'assistance d'une Intelligence Artificielle (Google Antigravity / Gemini 3.8 Flash & LM Studio).
+
 La version 2.0.0 de **LM Studio MCP Connector** permet d'agréger plusieurs machines ou serveurs exécutant LM Studio dans un cluster virtuel unifié.
 
 ---

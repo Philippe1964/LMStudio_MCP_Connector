@@ -1,5 +1,7 @@
 # Configuration & Déploiement Multi-OS
 
+> 🤖 **Avertissement / AI Transparency & Disclosure** : Document d'architecture généré avec l'assistance d'une Intelligence Artificielle (Google Antigravity / Gemini 3.8 Flash & LM Studio).
+
 Ce guide détaille l'ensemble des options de configuration, variables d'environnement et procédures de déploiement pour Linux, macOS et Windows.
 
 ---

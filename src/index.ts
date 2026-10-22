@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 /**
+ * [AI-GENERATED FILE]
+ * Ce fichier a été généré et structuré avec l'assistance d'une Intelligence Artificielle
+ * (Google Antigravity / Gemini 3.8 Flash & LM Studio local).
+ * Vérifié et validé par le Quality Gate strict (TypeScript strict, suites de tests).
+ *
  * LM Studio MCP Connector - Main Executable Entry Point
  */
 

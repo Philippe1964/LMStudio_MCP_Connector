@@ -6,6 +6,9 @@
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20Windows-blue.svg)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-2.0.0-purple.svg)](package.json)
+[![AI Generated](https://img.shields.io/badge/AI%20Assisted-Gemini%203.8%20Flash%20%7C%20LM%20Studio-blueviolet.svg)](.agents/rules/ai-transparency-disclosure.md)
+
+> 🤖 **Avertissement / AI Transparency & Disclosure** : Ce projet, son code source, ses scripts d'installation multi-OS et sa documentation technique ont été conçus et rédigés avec l'assistance d'une Intelligence Artificielle (**Google Antigravity** — Modèles : *Gemini 3.8 Flash* pour l'orchestration et modèles locaux *LM Studio* pour le calcul cognitif). L'ensemble du code est systématiquement testé et validé par un Quality Gate strict.
 
 Un serveur et daemon **Model Context Protocol (MCP)** autonome, moderne et ultra-résilient écrit en **TypeScript** pour connecter n'importe quelle plateforme agentique (Antigravity, Gemini, Claude Desktop, Cursor, VS Code) à une ou plusieurs instances de **LM Studio**.
 

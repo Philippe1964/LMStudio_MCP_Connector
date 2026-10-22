@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# [AI-GENERATED FILE] Generated with AI assistance (Google Antigravity / Gemini 3.8 Flash & LM Studio).
 # ==============================================================================
 # LM Studio MCP Connector - macOS Dedicated Installer & Configurator
 # Compatible with macOS Ventura, Sonoma, Sequoia (Intel x86_64 & Apple Silicon ARM64)

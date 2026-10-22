@@ -1,4 +1,5 @@
 <#
+# [AI-GENERATED FILE] Generated with AI assistance (Google Antigravity / Gemini 3.8 Flash & LM Studio).
 ==============================================================================
 LM Studio MCP Connector - Windows Dedicated Installer & Configurator
 Compatible with Windows 10, Windows 11, Windows Server (PowerShell 5.1 & Core 7+)
