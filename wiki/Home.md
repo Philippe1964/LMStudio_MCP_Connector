@@ -13,7 +13,8 @@
 3. [Résilience & Repli Distant](Failover-and-Resilience) — Circuit Breaker, bascule transparente et directive de repli distant Antigravity (*Remote Fallback*).
 4. [Dashboard Web & Monitoring](Web-GUI-Dashboard) — Interface Web de monitoring en temps réel, Server-Sent Events (SSE) et API REST.
 5. [Configuration & Déploiement](Configuration-and-Deployment) — Options CLI, variables d'environnement, configuration Antigravity et multi-OS.
-6. [Feuille de Route & Évolutions](Roadmap-and-Future-Evolutions) — Prochaines étapes : MCP Prompts prédéfinis et RAG local vectoriel.
+6. [Gouvernance des Agents, Skills & Règles](Skills-Agents-and-Rules) — Standards AGENTS.md, catalogue de skills, transparence IA et Quality Gate.
+7. [Feuille de Route & Évolutions](Roadmap-and-Future-Evolutions) — Prochaines étapes : MCP Prompts prédéfinis et RAG local vectoriel.
 
 ---
 

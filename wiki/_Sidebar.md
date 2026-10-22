@@ -6,6 +6,7 @@
 - [Résilience & Repli Distant](Failover-and-Resilience)
 - [Dashboard Web & Monitoring](Web-GUI-Dashboard)
 - [Configuration & Déploiement](Configuration-and-Deployment)
+- [Gouvernance, Skills & Règles](Skills-Agents-and-Rules)
 - [Feuille de Route](Roadmap-and-Future-Evolutions)
 
 ---
