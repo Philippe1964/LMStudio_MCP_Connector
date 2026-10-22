@@ -32,3 +32,4 @@ En commentaire d'en-tête :
 ```powershell
 # [AI-GENERATED FILE] Generated with AI assistance (Google Antigravity / Gemini 3.8 Flash & LM Studio).
 ```
+
